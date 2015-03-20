@@ -1,0 +1,27 @@
+=meta: 0.0.2
+
+name: Hither
+version: 0.0.1
+abstract: Database Migration Swiss Army Chainsaw
+homepage: https://metacpan.org/release/Hither
+language: perl
+license: perl
+copyright: 2015
+
+author:
+  name: Ingy döt Net
+  email: ingy@cpan.org
+  homepage: http://ingy.net
+  github: ingydotnet
+  twitter: ingydotnet
+  freenode: ingy
+
+devel:
+  git: https://github.com/ingydotnet/hither-pm
+  bug: https://github.com/ingydotnet/hither-pm/issues
+  irc: irc.freenode.net#pkg
+
+requires:
+  perl: 5.8.1
+  DBIx::Class: 0
+  DBIx::Class::DeploymentHandler: 0
