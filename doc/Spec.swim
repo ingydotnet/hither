@@ -1,0 +1,67 @@
+= Hither Specification =
+
+Hither is a general purpose database munging tool.
+
+== Overview
+
+Hither's primary goals are:
+
+* Provide a CLI command called `hither`
+* RDBMS schema and database migration
+* Provide a schema data definition language
+* Programming language agnostic
+* Database framework agnostic
+* Schema definition diffing
+* Generate database files from definitions
+  * DB schema files
+  * DB migration files
+* Generate database code from definitions
+  * DBIx::Class classes for Perl
+  * ActiveRecord classes for Ruby
+
+== Hither Command Actions
+
+The `hither` command has many actions. Here are some examples:
+
+- `hither migrate <options> <arguments>`
+
+  Migrate a database from state A to state B.
+
+- `hither import …`
+
+  Import a database from a source. Could be a dump or another database.
+
+- `hither generate …`
+
+  Generate things from things.
+
+- `hither diff …`
+
+== Implementation Strategy
+
+Hither will start out as a wrapper around other tools. It will patch and fill
+in gaps as necessary.
+
+For starters, heavy use will be made of:
+
+- `SQL::Translator`
+
+  This module does a lot of transformations. It is a good starting point.
+
+== Databases of Focus
+
+Eventually all popular, open source databases should be supported. For now just
+concentrating on 3 for bootstrapping phase. Having 3 concerns is a good number
+for agnostic, yet focused, projects.
+
+- PostgreSQL
+
+  This DB is driving the need for this tool currently.
+
+- SQLite
+
+  Simple, single file, real database. Good for prototyping and testing.
+
+- CSV
+
+  CSV is considered a database since so much open data is in this format.
