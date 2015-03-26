@@ -1,4 +1,10 @@
 ---
+version: 0.0.2
+date:    Thu Mar 26 11:33:51 PDT 2015
+changes:
+- Add basic bin command skeleton and sub command support
+- Add devel dummy test and test-more-bash
+---
 version: 0.0.1
 date:    Fri Mar 20 09:17:36 PDT 2015
 changes:

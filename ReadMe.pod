@@ -12,7 +12,7 @@ Hither - Database Migration Swiss Army Chainsaw
 
 =head1 Version
 
-This document describes L<Hither> version B<0.0.1>.
+This document describes L<Hither> version B<0.0.2>.
 
 =head1 Synopsis
 

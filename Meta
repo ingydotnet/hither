@@ -1,7 +1,7 @@
 =meta: 0.0.2
 
 name: Hither
-version: 0.0.1
+version: 0.0.2
 abstract: Database Migration Swiss Army Chainsaw
 homepage: https://metacpan.org/release/Hither
 language: perl
