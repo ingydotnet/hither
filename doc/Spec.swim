@@ -23,19 +23,67 @@ Hither's primary goals are:
 
 The `hither` command has many actions. Here are some examples:
 
-- `hither migrate <options> <arguments>`
-
-  Migrate a database from state A to state B.
-
 - `hither import …`
 
   Import a database from a source. Could be a dump or another database.
 
-- `hither generate …`
+- `hither make …`
 
   Generate things from things.
 
+- `hither migrate <options> <arguments>`
+
+  Migrate a database from state A to state B.
+
 - `hither diff …`
+
+  Produce a data diff from 2 schemas.
+
+- `hither info …`
+
+  Show info about a data source.
+
+== Data Sources and Targets
+
+- Databases
+
+  Actual live databases.
+
+- Dumps
+
+  Database and schema dumps.
+
+- Hither Schema Definitions (HSD files)
+
+  Hither defined schema data in YAML files.
+
+- Migration SQL
+
+  SQL files that migrate a specific database in a specific state.
+
+== Hither Migration Strategy
+
+A database is always in a given "state". This state is effectively its schema.
+Hither can:
+
+* Generate a HSD file from a DB's schema.
+  * HSD is meant to be canonical.
+  * Human edited/maintained.
+  * Everything else generated from it.
+* Generate a DB schema from a HSD.
+* Generate ORM code (DBIx::Class) from a HSD.
+* Diff 2 HSD files to produce a migration.
+
+The state should be given a name.  The exact name scheme is yet TBD. It could
+be the SHA1 of the HSD file. It could include the branch name of associated
+code.
+
+The state-name should be stored in the database. It can be stored in a
+'hither-state' table.
+
+Each branch of a codebase expects a DB to be in some exact state. The code
+should somehow declare the state-name. The generated ORM code could have that
+state-name baked in.
 
 == Implementation Strategy
 

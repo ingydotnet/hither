@@ -56,22 +56,87 @@ The C<hither> command has many actions. Here are some examples:
 
 =over
 
-=item C<< hither migrate <options> <arguments> >>
-
-Migrate a database from state A to state B.
-
 =item C<hither import …>
 
 Import a database from a source. Could be a dump or another database.
 
-=item C<hither generate …>
+=item C<hither make …>
 
 Generate things from things.
 
+=item C<< hither migrate <options> <arguments> >>
+
+Migrate a database from state A to state B.
+
 =item C<hither diff …>
 
+Produce a data diff from 2 schemas.
+
+=item C<hither info …>
+
+Show info about a data source.
 
 =back
+
+=head2 Data Sources and Targets
+
+=over
+
+=item Databases
+
+Actual live databases.
+
+=item Dumps
+
+Database and schema dumps.
+
+=item Hither Schema Definitions (HSD files)
+
+Hither defined schema data in YAML files.
+
+=item Migration SQL
+
+SQL files that migrate a specific database in a specific state.
+
+=back
+
+=head2 Hither Migration Strategy
+
+A database is always in a given "state". This state is effectively its schema.
+Hither can:
+
+=over
+
+=item * Generate a HSD file from a DB's schema.
+
+=over
+
+=item * HSD is meant to be canonical.
+
+=item * Human edited/maintained.
+
+=item * Everything else generated from it.
+
+=back
+
+=item * Generate a DB schema from a HSD.
+
+=item * Generate ORM code (DBIx::Class) from a HSD.
+
+=item * Diff 2 HSD files to produce a migration.
+
+=back
+
+The state should be given a name. The exact name scheme is yet TBD. It
+could be the SHA1 of the HSD file. It could include the branch name of
+associated code.
+
+The state-name should be stored in the database. It can be stored in a 'hither-
+state' table.
+
+Each branch of a codebase expects a DB to be in some exact state. The code
+should somehow declare the state-name. The generated ORM code could have that
+state-name baked in.
 
 =head2 Implementation Strategy
 
