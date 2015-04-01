@@ -20,13 +20,37 @@ Hither's primary goals are:
 
 =item * RDBMS schema and database migration
 
+=over
+
+=item * Non-linear (hopefully)
+
+=item * Reversable (hopefully)
+
+=back
+
 =item * Provide a schema data definition language
+
+=over
+
+=item * Hither Schema Definition (HSD)
+
+=back
+
+=item * Provide a migration data definition language
+
+=over
+
+=item * Hither Migration Definition (HMD)
+
+=back
 
 =item * Programming language agnostic
 
 =item * Database framework agnostic
 
-=item * Schema definition diffing
+=item * Schema definition diffing to generate migrations
+
+=item * Smart migration dependency tracking
 
 =item * Generate database files from definitions
 
@@ -38,11 +62,13 @@ Hither's primary goals are:
 
 =back
 
-=item * Generate database code from definitions
+=item * Generate ORM code from definitions
 
 =over
 
 =item * DBIx::Class classes for Perl
+
+=item * Django model classes for Python
 
 =item * ActiveRecord classes for Ruby
 
@@ -56,21 +82,24 @@ The C<hither> command has many actions. Here are some examples:
 
 =over
 
-=item C<hither import …>
+=item C<< hither migration <hsd1> <hsd2> >>
 
-Import a database from a source. Could be a dump or another database.
-
-=item C<hither make …>
-
-Generate things from things.
+Produce a schema from 2 hither schemas definitions.
 
 =item C<< hither migrate <options> <arguments> >>
 
 Migrate a database from state A to state B.
 
-=item C<hither diff …>
+=item C<hither make …>
 
-Produce a data diff from 2 schemas.
+Generate things from things. Useful for generating ORM code. Examples:
+
+    hither make --from=database.hsd --out=dbix
+    hither make --from=database.hsd --out=django
+
+=item C<hither import …>
+
+Import a database from a source. Could be a dump or another database.
 
 =item C<hither info …>
 
@@ -93,6 +122,10 @@ Database and schema dumps.
 =item Hither Schema Definitions (HSD files)
 
 Hither defined schema data in YAML files.
+
+=item Hither Migration Definitions (HMD files)
+
+Hither defined migration data in YAML files.
 
 =item Migration SQL
 
@@ -121,7 +154,7 @@ Hither can:
 
 =item * Generate a DB schema from a HSD.
 
-=item * Generate ORM code (DBIx::Class) from a HSD.
+=item * Generate ORM code (DBIx::Class, Django) from a HSD.
 
 =item * Diff 2 HSD files to produce a migration.
 
@@ -131,12 +164,13 @@ The state should be given a name. The exact name scheme is yet TBD. It
 could be the SHA1 of the HSD file. It could include the branch name of
 associated code.
 
-The state-name should be stored in the database. It can be stored in a 'hither-
-state' table.
+The state-name should be stored in the database. It can be stored in a
+C<hither> table.
 
 Each branch of a codebase expects a DB to be in some exact state. The code
-should somehow declare the state-name. The generated ORM code could have that
-state-name baked in.
+should somehow declare the current state-name. If only one codebase is using
+the database, the HSD files should be kept in that codebase. The generated ORM
+code could have that state-name baked in.
 
 =head2 Implementation Strategy
 
@@ -149,9 +183,21 @@ For starters, heavy use will be made of:
 
 =item C<SQL::Translator>
 
-This module does a lot of transformations. It is a good starting point.
+This module does a lot of transformations. It is a good starting point. (It is
+the basis of much of DBIx::Class::DeploymentHandler).
 
 =back
+
+=head3 Django migrate
+
+Pythons Django MVC framework has a built-in database migration strategy and
+toolset. It appears to be well thought out. Hither will attempt to follow the
+Django leads that make sense.
+
+The main difference is that Django uses Python code as the canonical
+definition of things to generate other things. Hither uses (langauge agnostic)
+data to define all the same things, and generate the same things, including
+the Python, Perl, Ruby, etc ORM code.
 
 =head2 Databases of Focus
 
@@ -175,11 +221,15 @@ CSV is considered a database since so much open data is in this format.
 
 =back
 
+=head2 ORMs of Focus
+
+The primary focus for now, is Perl's C<DBIx::Class>.
+
 =head2 Sample Usage
 
     hither import --in=http://opendata.org/some.csv --out=psql
     hither make --in=psql --out=some.hsd
-    hither diff some1.hsd some2.hsd --out=migrate.hmd
+    hither migration some1.hsd some2.hsd --out=migrate.hmd
     hither migrate --in=migrate.hmd --out=psql
 
 =cut
