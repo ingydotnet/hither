@@ -175,4 +175,11 @@ CSV is considered a database since so much open data is in this format.
 
 =back
 
+=head2 Sample Usage
+
+    hither import --in=http://opendata.org/some.csv --out=psql
+    hither make --in=psql --out=some.hsd
+    hither diff some1.hsd some2.hsd --out=migrate.hmd
+    hither migrate --in=migrate.hmd --out=psql
+
 =cut
