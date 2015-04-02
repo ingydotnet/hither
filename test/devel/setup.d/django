@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+virtual_dir=django
+django_dir="$virtual_dir/hither_django_testing"
+
+if [ "$1" == -R ]; then
+  rm -fr $virtual_dir
+fi
+
+if [ ! -d "$virtual_dir" ]; then
+  virtualenv $virtual_dir
+fi
+
+if [ ! -d "$django_dir" ]; then
+  git clone git@github.com:ingydotnet/hither-django-testing "$django_dir"
+fi
+
+# Set up python env:
+(
+  cd "$virtual_dir"
+
+  source bin/activate
+  if ! `which django-admin &>/dev/null`; then
+    pip install django
+    pip install pyyaml
+  fi
+) &> /dev/null
+source $virtual_dir/bin/activate
+
+# Set up django:
+(
+  cd "$django_dir"
+  git clean -dxf
+
+  cp data_viewer/models-1.py data_viewer/models.py
+  yes | ./manage.py makemigrations
+  ./manage.py migrate
+) &> /dev/null
+
+# vim: set ft=sh:
