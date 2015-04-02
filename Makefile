@@ -12,3 +12,6 @@ test:
 
 doc:
 	make -C doc/
+
+clean:
+	rm -fr django
