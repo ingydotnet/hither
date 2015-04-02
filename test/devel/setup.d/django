@@ -17,6 +17,7 @@ fi
 
 # Set up python env:
 (
+set -e
   cd "$virtual_dir"
 
   source bin/activate
@@ -27,14 +28,7 @@ fi
 ) &> /dev/null
 source $virtual_dir/bin/activate
 
-# Set up django:
-(
-  cd "$django_dir"
-  git clean -dxf
-
-  cp data_viewer/models-1.py data_viewer/models.py
-  yes | ./manage.py makemigrations
-  ./manage.py migrate
-) &> /dev/null
+cd "$django_dir"
+git clean -dxf &> /dev/null
 
 # vim: set ft=sh:
