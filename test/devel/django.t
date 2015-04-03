@@ -4,13 +4,13 @@ source "$(dirname $0)/setup"
 source "$(dirname $0)/setup.d/django"
 use Test::More
 
-# We are cd'd into to django directory:
+# We are cd'd into to django virtualenv directory:
 
 #------------------------------------------------------------------------------
 # Create a starter model:
 (
   cp data_viewer/models-1.py data_viewer/models.py
-  yes | ./manage.py makemigrations
+  ./manage.py makemigrations
   ./manage.py migrate
 ) &> /dev/null
 
@@ -47,10 +47,10 @@ use Test::More
 }
 
 #------------------------------------------------------------------------------
-# Create a starter model:
+# Change a column name in table:
 (
   cp data_viewer/models-2.py data_viewer/models.py
-  yes | ./manage.py makemigrations
+  echo yes | ./manage.py makemigrations
   ./manage.py migrate
 ) &> /dev/null
 
@@ -67,7 +67,6 @@ use Test::More
   like "$output" 'camera_labels' \
     'Column is called "camera_labels"'
 }
-
 
 done_testing
 
