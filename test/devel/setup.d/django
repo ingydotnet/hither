@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-test_dir=test/tmp
+test_dir="$(dirname "$0")"
 virtualenv_dir="$test_dir/django"
 django_repo=hither-django-testing
 django_project="${django_repo//-/_}"

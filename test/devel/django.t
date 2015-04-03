@@ -9,7 +9,7 @@ use Test::More
 #------------------------------------------------------------------------------
 # Create a starter model:
 (
-  cp data_viewer/models-1.py data_viewer/models.py
+  cp src/share/models-1.py data_viewer/models.py
   ./manage.py makemigrations
   ./manage.py migrate
 ) &> /dev/null
@@ -32,7 +32,7 @@ use Test::More
 #------------------------------------------------------------------------------
 # Import the fixture data into the database:
 (
-  ./manage.py loaddata data_viewer/fixtures/initial_data.yaml
+  ./manage.py loaddata data_viewer/fixtures/Seattle-Traffic-Cams.yaml
 ) &> /dev/null
 
 # Dump sqlite3 db and test output:
@@ -49,7 +49,7 @@ use Test::More
 #------------------------------------------------------------------------------
 # Change a column name in table:
 (
-  cp data_viewer/models-2.py data_viewer/models.py
+  cp src/share/models-2.py data_viewer/models.py
   echo yes | ./manage.py makemigrations
   ./manage.py migrate
 ) &> /dev/null
