@@ -1,34 +1,38 @@
 #!/usr/bin/env bash
 
-virtual_dir=django
-django_dir="$virtual_dir/hither_django_testing"
+test_dir=test/tmp
+virtualenv_dir="$test_dir/django"
+django_repo=hither-django-testing
+django_project="${django_repo//-/_}"
+django_app=data_viewer
+django_dir="$virtualenv_dir/$django_project"
 
 if [ "$1" == -R ]; then
-  rm -fr $virtual_dir
+  rm -fr "$virtualenv_dir"
 fi
 
-if [ ! -d "$virtual_dir" ]; then
-  virtualenv $virtual_dir
-fi
-
-if [ ! -d "$django_dir" ]; then
-  git clone git@github.com:ingydotnet/hither-django-testing "$django_dir"
+if [ ! -d "$virtualenv_dir" ]; then
+  (
+    virtualenv "$virtualenv_dir" &>/dev/null
+    git clone \
+      "git@github.com:ingydotnet/$django_repo" \
+      "$django_dir"
+  ) &>/dev/null
 fi
 
 # Set up python env:
 (
-set -e
-  cd "$virtual_dir"
+  cd "$virtualenv_dir"
 
   source bin/activate
   if ! `which django-admin &>/dev/null`; then
     pip install django
     pip install pyyaml
   fi
-) &> /dev/null
-source $virtual_dir/bin/activate
+) &>/dev/null
+source $virtualenv_dir/bin/activate
 
 cd "$django_dir"
-git clean -dxf &> /dev/null
+git clean -dxf &>/dev/null
 
 # vim: set ft=sh:
