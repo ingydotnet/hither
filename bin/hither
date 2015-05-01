@@ -16,7 +16,7 @@ The most commonly used commands:
   dump      Dump a database
   make      Generate Hither files:
             - 'hsd' Hither Schema Definition
-            - 'hsm' Hither Schema Migration
+            - 'hmd' Hither Migration Definition
             - 'hdf' Hither Data Fixture
 
 See 'hither help' for more help.
@@ -168,7 +168,7 @@ set-out() {
 # Support pg://user:password@hostname:port/db?opt=val
 set-var() {
   local var="$1"
-  if [[ "$val" =~ \.(hsd|hsm|hdf|sql)$ ]]; then
+  if [[ "$val" =~ \.(hsd|hmd|hdf|sql)$ ]]; then
     printf -v $var "${BASH_REMATCH[1]}"
   elif [[ "$val" =~ \.sqlite3$ ]]; then
     printf -v $var lite
