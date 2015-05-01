@@ -1,6 +1,43 @@
+To Do Next
+
++ Implement hither-hsd-from-pg using pg-schema-to-json
+  - Need --profile support for PG_PASSWORD
+- Implement hsd-to-django-model
+  - HSD YAML + Template Toolkit
+- Implement hither-hsm-from-hsd using:
+  - hsd-to-django-model
+  - Django migrate
+  - django-migrate-to-hsm
+- Setup doc/man/bash-helper doc stuff like git-hub
+- Write Hither doc/manual
+- Release to CPAN
+- Plan upcoming tasks and milestones
 
 
-== Later
 
-- Bash/Zsh command completion
 
+- Imports
+  - Load PG-SQL-Dump into PG-DB
+    - File or URL
+  - Load PG-SQL-Dump into Lite-DB
+    - For testing Django/SQLite w/ bookland DB
+    - http://stackoverflow.com/questions/6148421/how-to-convert-a-postgres-database-to-sqlite
+    - `sqlt -f PostgreSQL -t SQLite foo-pg.sql > foo-lite.sql`
+  - Import CSV into PG-DB
+  - Import CSV into Lite-DB
+    - `echo .import data.csv table_name | sqlite3 data.sqlite`
+- Django
+  - Create Django models from booktown DB
+    - https://docs.djangoproject.com/en/1.8/howto/legacy-databases/
+- DBIx::Class
+  - Use SQL::Translator to generate DBIx::Class models from bookland DB
+    - `cpanm --look DBIx::Class`
+- Hither Schema Definition
+  - Design HSD from django and DBIx::Class models
+  - Use sqlt to make YAML:
+    - `sqlt -f PostgreSQL -t SQLite schema.sql > schema.yaml`
+  - Generate Django model class from HSD
+  - Generate DBIx model class from HSD
+- Migration
+  - Use django models (from HSD) to make migration
+  - Look into turning migration into Hither Migration Format (tbd format)

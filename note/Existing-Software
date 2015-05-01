@@ -1,0 +1,34 @@
+These are the existing database tools that Hither is using under the hood
+and/or borrowing ideas from:
+
+- Django
+
+  Django is a very popular Python MVC framework, with a builtin ORM and solid
+  migration tools and stratagies. The migration doc is here:
+
+  * https://docs.djangoproject.com/en/1.8/topics/migrations/
+
+- ActiveRecord
+
+  ActiveRecord is the popular Ruby ORM that Rails uses.
+
+- DBIx::Class
+
+  DBIx::Class is the popular Perl ORM used by Dancer and others.
+
+- DBIx::Class::DeploymentHandler
+
+  This is a toolset for handling DBIx::Class database migrations.
+
+  * https://metacpan.org/pod/DBIx::Class::DeploymentHandler
+  * https://metacpan.org/pod/DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator
+
+- SQL::Translator
+
+  A general purpose database munging tool written in Perl. Includes a command
+  line tool for some operations.
+
+  * https://metacpan.org/pod/SQL::Translator
+  * https://metacpan.org/pod/SQL::Translator::Manual
+  * https://metacpan.org/pod/SQL::Translator::Parser::DBIx::Class
+

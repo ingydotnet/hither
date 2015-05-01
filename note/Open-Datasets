@@ -1,0 +1,24 @@
+Links to sample datasets on the Internet:
+
+== General
+
+* http://dev.mysql.com/doc/world-setup/en/
+* http://chinookdatabase.codeplex.com/
+
+== PG
+
+* https://wiki.postgresql.org/wiki/Sample_Databases
+* http://www.commandprompt.com/ppbook/booktown.sql
+  * From http://www.commandprompt.com/ppbook/ (2002)
+
+== SQLite
+
+* http://veekun.com/static/pokedex/downloads/veekun-pokedex.sqlite.gz
+
+== MySQL
+
+== CSV
+
+* Seattle-Traffic-Cams
+  * https://data.seattle.gov/api/views/65fc-btcc/rows.csv
+

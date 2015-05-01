@@ -1,0 +1,60 @@
+This is a list of the database related things (nouns) that Hither cares about.
+
+- Databases
+
+  The Database implementations we work with:
+
+  * PostgreSQL
+  * MySQL
+  * SQLite
+
+- Codebases
+
+  A software codebase/repo expects a database to be in a given state/schema.
+  Hither gives the state an ID, that should be put into the codebase. The
+  application can check the state when connecting.
+
+- SQL Schema Files
+
+- SQL Data Dumps
+
+- SQL Migration Files
+
+- Hither Data Fixture Files
+
+  - Database content in a YAML (or CSV) file
+
+- CSV Files
+
+  Hither can produce schemas and fixtures from datasets that are stored as CSV.
+  This is useful for testing and playing with Hither. There are a ton of CSV
+  datasets on the Internet.
+
+- ORM Schema Classes
+
+  * DBIx::Class
+  * Django model classes
+  * Rails model classes
+
+- Hither Schema Definition (HSD) Files
+
+  A YAML file that contains all the info to generate an SQL schema or ORM
+  class. Each database has an HSD file that defines its current state.
+
+- Hither State ID
+
+  This is the (probably) the SHA1 of a HSD file's content. It provides a
+  single, definitive name for the schema state that a database is currently in.
+  This value is kept in the database's "hither" table. It is also kept in the
+  codebase(s) that use the database (declaring the state that the code revision
+  expects the database to be in).
+
+- Hither State Table
+
+  The database has a table called "hither" that contains a history of the
+  states and migrations between them.
+
+- Hither Migration File
+
+  A YAML file that contains all the info needed to perform a migration from one
+  state to another.

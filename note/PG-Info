@@ -1,0 +1,57 @@
+== Creating a PG User
+
+If you are simply playing around with Hither and PostgreSQL, you should
+probably create a pguser that matches your `$USER`. Run these commands:
+
+  sudo -u postgres createuser -s -d -r $USER
+  createdb
+
+You can also run commands as the `postgres` user:
+
+  sudo -u postgres psql
+
+Maybe setup these aliases:
+
+    alias psql='sudo -u postgres psql '
+    alias pg_dump='sudo -u postgres pg_dump '
+
+== Common Commandline Operations
+
+- Start postgres shell as `postgres` admin user:
+
+
+- Connect to 'hither' db
+
+    psql -d hither
+
+- Run a single db command
+
+    psql -c <command>
+
+- Load database from dump:
+
+    psql <dbname> -f dump.sql
+
+- Dump database:
+
+    dg_dump <dbname> > dump.sql
+
+    -t <table>   # specific table
+    -a           # data only
+    -s           # schema only
+
+== Common Postgres Shell Commands
+
+- `\?`
+
+  Help for all `\` commands
+
+- `\l`
+
+  List all databases
+
+- `\c <dbame>`
+
+  Connect to a database
+
+== Doc Links

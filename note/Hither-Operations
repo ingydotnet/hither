@@ -1,0 +1,27 @@
+This is set of examples of some of the database related operations (verbs) that
+Hither can do:
+
+  # Load a pg-db from a pg-sql-dump
+  hither load --in=http://www.commandprompt.com/ppbook/booktown.sql \
+              --out=booktown.pg
+
+  # Generate an HSD file from a pg-db
+  hither make --in=booktown.pg \
+              --to=hsd > booktown-1.hsd
+
+  # Dump a pg-db to a hither fixture
+  hither dump --in=booktown.pg \
+              --out=booktown-1.hdf
+
+  # Dump pg-db to SQL
+  hither dump --from=pg \
+              --out=booktown.sql
+
+  # Make a Hither migration from 2 hither states
+  hither make --in=booktown-1.hsd \
+              --in=booktown-2.hsd \
+              --out=migrate-1-2.hsm
+
+  # Make a pg schema sql migration from a Hither migration
+  hither make --in=migrate-1-2.hsm \
+              --out=migrate-1-2.sql
