@@ -8,8 +8,8 @@ Hither's primary goals are:
 
 * Provide a CLI command called `hither`
 * RDBMS schema and database migration
-  * Non-linear (hopefully)
-  * Reversable (hopefully)
+  * Non-linear
+  * Reversable
 * Provide a schema data definition language
   * Hither Schema Definition (HSD)
 * Provide a migration data definition language
