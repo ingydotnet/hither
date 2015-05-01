@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 source "$(dirname $0)/setup"
-source "$(dirname $0)/setup.d/django"
+source "$(dirname $0)/setup.d/django" # -R
 use Test::More
 
 # We are cd'd into to django virtualenv directory:
