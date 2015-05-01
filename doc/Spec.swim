@@ -30,22 +30,18 @@ Hither's primary goals are:
 
 The `hither` command has many actions. Here are some examples:
 
-- `hither migration <hsd1> <hsd2>`
+- `hither make --in=<hsd1> -in=<hsd2> --to=hmd`
 
-  Produce a schema from 2 hither schemas definitions.
-
-- `hither migrate <options> <arguments>`
-
-  Migrate a database from state A to state B.
+  Produce a Hither migration from 2 Hither schemas definitions.
 
 - `hither make …`
 
   Generate things from things. Useful for generating ORM code. Examples:
 
-    hither make --from=database.hsd --out=dbix
-    hither make --from=database.hsd --out=django
+    hither make --in=database.hsd --out=dbix
+    hither make --in=database.hsd --out=django
 
-- `hither import …`
+- `hither load …`
 
   Import a database from a source. Could be a dump or another database.
 
@@ -92,13 +88,13 @@ The state should be given a name.  The exact name scheme is yet TBD. It could
 be the SHA1 of the HSD file. It could include the branch name of associated
 code.
 
-The state-name should be stored in the database. It can be stored in a
-`hither` table.
+The state-id should be stored in the database. It can be stored in a `hither`
+table.
 
 Each branch of a codebase expects a DB to be in some exact state. The code
-should somehow declare the current state-name. If only one codebase is using
-the database, the HSD files should be kept in that codebase. The generated ORM
-code could have that state-name baked in.
+should somehow declare the current state-id. If only one codebase is using the
+database, the HSD files should be kept in that codebase. The generated ORM
+code could have that state-id baked in.
 
 == Implementation Strategy
 
@@ -147,8 +143,8 @@ The primary focus for now, is Perl's `DBIx::Class`.
 
 == Sample Usage
 
-  hither import --in=http://opendata.org/some.csv --out=psql
-  hither make --in=psql --out=some.hsd
-  hither migration some1.hsd some2.hsd --out=migrate.hmd
-  hither migrate --in=migrate.hmd --out=psql
+  hither load --in=http://opendata.org/some.csv --out=foo.pg
+  hither make --in=foo.pg --out=some.hsd
+  hither make some1.hsd some2.hsd --out=migrate.hmd
+  hither make --in=migrate.hmd --out=sql
 
