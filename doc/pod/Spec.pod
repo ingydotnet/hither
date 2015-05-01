@@ -22,9 +22,9 @@ Hither's primary goals are:
 
 =over
 
-=item * Non-linear (hopefully)
+=item * Non-linear
 
-=item * Reversable (hopefully)
+=item * Reversable
 
 =back
 
