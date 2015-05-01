@@ -6,9 +6,9 @@ PATH="$PWD/bin:$PATH"
 CWD="$(dirname $0)"
 export HITHER_PROFILE=$CWD/pg-profile.sh
 
-# hither load \
-#   --in=http://www.commandprompt.com/ppbook/booktown.sql \
-#   --out=booktown.pg
+hither load \
+  --in=http://www.commandprompt.com/ppbook/booktown.sql \
+  --out=booktown.pg
 
 rm -f booktown-1.hsd
 hither make \
