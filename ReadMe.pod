@@ -8,31 +8,84 @@ See http://github.com/ingydotnet/swim-pm#readme
 
 =head1 Name
 
-Hither - Database Migration Swiss Army Chainsaw
+hither - Database Munging Swiss Army Chainsaw
 
-=head1 Version
-
-This document describes L<Hither> version B<0.0.2>.
+=for html
+<a href="https://travis-ci.org/ingydotnet/hither"><img src="https://travis-ci.org/ingydotnet/hither.png" alt="hither"></a>
 
 =head1 Synopsis
 
-    use Hither;
+    # Load a sample Postgres database
+    > hither load --in=http://www.commandprompt.com/ppbook/booktown.sql \
+                  --out=booktown.pg
+    # Generate a Hither Schema Definition
+    > hither make --in=booktown.pg --out=schema1.hsd
+    # Generate an SQL migration
+    > hither make --in=schema1.hsd --in=schema2.hsd --to=sql > migration.sql
 
 =head1 Description
 
-Hither is a new database migration tool authored by Ingy. Stay tuned.
+Hither is a generic database manipulation tool. It does complicated and
+annoying database operations in simple and consistent manners.
 
-=head1 Author
+=head2 Supported Databases
 
-Ingy döt Net <ingy@cpan.org>
+=over
 
-=head1 Copyright and License
+=item * PostgreSQL
+
+=item * MySQL
+
+=item * SQLite
+
+=back
+
+=head2 Supported Dataset Sources
+
+=over
+
+=item * Databases above
+
+=item * SQL dumps
+
+=item * CSV and TSV files
+
+=item * Hither fixture files (YAML)
+
+=back
+
+=head2 Supported I/O
+
+=over
+
+=item * File URLs (input only)
+
+=item * Database names
+
+=item * File paths
+
+=item * STDIN / STDOUT
+
+=back
+
+=head2 Supported Operations
+
+=over
+
+=item * Load database from database source
+
+=item * Dump database to various formats
+
+=item * Extract database schema to HSD (Hither Schema Definition)
+
+=item * Generate migration from 2 HSDs
+
+=back
+
+=head1 Copyright & License
 
 Copyright 2015. Ingy döt Net.
 
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
-See L<http://www.perl.com/perl/misc/Artistic.html>
+The MIT License (MIT)
 
 =cut

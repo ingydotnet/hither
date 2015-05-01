@@ -24,4 +24,4 @@ devel:
 requires:
   perl: 5.8.1
   DBIx::Class: 0
-  DBIx::Class::DeploymentHandler: 0
+  SQL::Translator: 0

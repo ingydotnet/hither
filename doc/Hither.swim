@@ -1,11 +1,54 @@
-<<<cpan-head>>>
+hither
+======
+
+Database Munging Swiss Army Chainsaw
+
+<badge travis ingydotnet/hither>
 
 = Synopsis
 
-  use Hither;
+  # Load a sample Postgres database
+  > hither load --in=http://www.commandprompt.com/ppbook/booktown.sql \
+                --out=booktown.pg
+  # Generate a Hither Schema Definition
+  > hither make --in=booktown.pg --out=schema1.hsd
+  # Generate an SQL migration
+  > hither make --in=schema1.hsd --in=schema2.hsd --to=sql > migration.sql
 
 = Description
 
-Hither is a new database migration tool authored by Ingy. Stay tuned.
+Hither is a generic database manipulation tool. It does complicated and
+annoying database operations in simple and consistent manners.
 
-<<<cpan-tail>>>
+== Supported Databases
+
+* PostgreSQL
+* MySQL
+* SQLite
+
+== Supported Dataset Sources
+
+* Databases above
+* SQL dumps
+* CSV and TSV files
+* Hither fixture files (YAML)
+
+== Supported I/O
+
+* File URLs (input only)
+* Database names
+* File paths
+* STDIN / STDOUT
+
+== Supported Operations
+
+* Load database from database source
+* Dump database to various formats
+* Extract database schema to HSD (Hither Schema Definition)
+* Generate migration from 2 HSDs
+
+= Copyright & License
+
+Copyright 2015. Ingy döt Net.
+
+The MIT License (MIT)
