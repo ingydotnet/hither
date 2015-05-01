@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+. $(dirname $0)/setup.bash \
+  sudo \
+  profile \
+
+PG -c "drop database $db_name" &>/dev/null || true
+CURL "$hither_pg_sql_dump" | PG &>/dev/null
+
+# Dump books table to make sure it worked:
+#PG -d $hither_db_name -c 'select * from books' 2>/dev/null
+
+# vim: set ft=sh:

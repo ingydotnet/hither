@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/hither"
+
+[ -n "$HITHER_DBNAME" ] ||
+  die "Command requires a database name"
+
+run-psql -c "drop database $HITHER_DBNAME" &>/dev/null || true
+if [[ "$HITHER_IN" =~ ^https?: ]]; then
+  curl -s "$HITHER_IN" | run-psql &>/dev/null
+else
+  curl -s "$HITHER_IN" | run-psql &>/dev/null
+fi
+
+# Dump books table to make sure it worked:
+run-psql -d $HITHER_DBNAME -c 'select * from books' 2>/dev/null
+
+
+# vim: set ft=sh:

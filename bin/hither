@@ -1,117 +1,226 @@
-#!/usr/bin/env perl
+#!/usr/bin/env bash
+#
+# hither: Database Munging Swiss Army Chainsaw
+#
+# Copyright (c) 2015 Ingy döt Net
 
-use v5.10;
-use strict;
-use warnings;
-use utf8;
-binmode STDOUT, ':utf8';
+set -e
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/bash+.bash"
+bash+:import :std can
 
-my $usage = <<"...";
-Usage:
-    hither [<hither-opt>…] <hither-command> [<cmd-opt>…] [<cmd-arg>…]
+OPTIONS_SPEC="\
+hither <command> <options> <arguments>
 
-Hither Options:
-  -q, --quiet     - Suppress normal output
-  -v, --verbose   - Print detailed info
-  -D, --debug     - Print maximum info
-  -h, --help      - Show basic command usage
+The most commonly used commands:
+  load      Load a database
+  dump      Dump a database
+  make      Generate Hither files:
+            - 'hsd' Hither Schema Definition
+            - 'hsm' Hither Schema Migration
+            - 'hdf' Hither Data Fixture
 
-For more help/info, try these commands:
+See 'hither help' for more help.
 
-  hither help             - Browse Hither documentation manual
-  hither help commands    - List all hither commands
-  hither help <command>   - Show help for a command
+Options:
+--
+h           Show the command summary
+help        Browse the complete 'hither' documentation
+ 
+i,in=       Input: File, URL or DB
+o,out=      Output: File or DB
+f,from=     Input data/database/hither type
+t,to=       Output data/datbase/hither type
+ 
+p,profile=  Shell profile to be sourced
+m,metadata= Data file w/ info to make targets
+ 
+q,quiet     Show minimal output
+v,verbose   Show verbose output
+D,debug     Show maximum DEBUG info
+"
 
-...
+main() {
+  local OK=0
 
-# Hither general command options. We put these in environment variables, since
-# this program will exec the worker command.
-$ENV{HITHER_QUIET} = 0;
-$ENV{HITHER_VERBOSE} = 0;
-$ENV{HITHER_DEBUG} = 0;
+  init-env
+  get-opts "$@"
+  check-profile
 
-          use XXX;
-sub run {
-  my ($self) = @_;
-  $self->check_help and return 0;
-  $self->get_options or return 1;
-  $self->exec_hither_command or return 1;
+  if can "command:$command"; then
+    "command:$command" "${command_arguments[@]}"
+  elif $(type "hither-$command" &>/dev/null); then
+    "hither-$command" "${command_arguments[@]}"
+  else
+    die "Unsupported hither command: '$command'\n"
+  fi
 }
 
-sub check_help {
-  my ($self) = @_;
-  my $argv = $self->{argv};
-  for (@$argv) {
-    if ( /^ ( -h | --help ) $/x ) {
-      print $usage;
-      return 1;
-    }
-    return if /^\w/;
-  }
+command:help() {
+  exec man hither
 }
 
-sub get_options {
-  my ($self) = @_;
-  my $argv = $self->{argv};
-  while (@$argv) {
-    $_ = shift @$argv;
-    if (/^\w/) {
-      $self->{cmd} = $_;
-      $self->{args} = [ @$argv ];
-      return 1;
-    }
-    elsif (/^ ( -q | --quiet ) $/x) {
-      $ENV{HITHER_QUIET} = 1;
-    }
-    elsif (/^ ( -v | --verbose ) $/x) {
-      $ENV{HITHER_VERBOSE} = 1;
-    }
-    elsif (/^ ( -D | --debug ) $/x) {
-      $ENV{HITHER_DEBUG} = 1;
-    }
-    else {
-      warn "Unknown hither option: '$_'\n";
-      return;
-    }
-  }
-  $self->{cmd} = 'shell';
-  return 1;
+command:load() {
+  "hither-load-$to-from-$from" "$@"
 }
 
-sub exec_hither_command {
-  my ($self) = @_;
-  my $command = $self->{cmd} or die;
-  my $command_path = `which hither-$command` or do {
-    warn "Unknown hither command: '$command'\n";
-    return;
-  };
-  chomp $command_path;
-  my $args = $self->{args} or die;
-  unshift @$args, $command_path;
-  exec { $command_path } @$args or do {
-    warn "Bad hither command: '$command':\n$!\n";
-    return;
-  }
+command:make() {
+  "hither-make-$to-from-$from" "$@"
 }
 
-my %options = (
-  verbose => 0,
-  quiet => 0,
-  quiet => 0,
-);
+init-env() {
+  sha1sum=sha1sum
+  shopt_opt='shopt -s nullglob globstar'
+  if [[ "$OSTYPE" =~ ^darwin|^freebsd ]]; then
+    sha1sum=shasum
+    shopt_opt='shopt -s nullglob'
+  fi
 
-if ($ENV{HITHER_TEST_MODE}) {
-  # TODO Run according to test harness rules.
-}
-else {
-  my $self = bless {
-    argv => [ @ARGV ],
-    opts => {},
-    cmd => '',
-    args => [],
-  }, __PACKAGE__;
+  assert-command curl cut git grep head ln mv readlink "$sha1sum" tr
 
-  exit $self->run();
+  export HITHER_QUIET="${HITHER_QUIET:-false}"
+  export HITHER_VERBOSE="${HITHER_VERBOSE:-false}"
+  export HITHER_DEBUG="${HITHER_DEBUG:-false}"
 }
 
-# vim: set sw=2:
+get-opts() {
+  [ $# -eq 0 ] && set -- --help
+
+  eval "$(
+    echo "$OPTIONS_SPEC" |
+      git rev-parse --parseopt -- "$@" ||
+    echo exit $?
+  )"
+
+  while [ $# -gt 0 ]; do
+    local option="$1"; shift
+    case "$option" in
+      -i)
+        set-in "$1"
+        shift
+        ;;
+      -o)
+        set-out "$1"
+        shift
+        ;;
+      -f)
+        export HITHER_FROM="$1"
+        shift
+        ;;
+      -t)
+        export HITHER_TO="$1"
+        shift
+        ;;
+
+      -p)
+        export HITHER_PROFILE="$1"
+        shift
+        ;;
+      -m)
+        export HITHER_METADATA="$1"
+        shift
+        ;;
+
+      -q) export HITHER_QUIET=true ;;
+      -v) export HITHER_VERBOSE=true ;;
+      -D) export HITHER_DEBUG=true ;;
+
+      --) break ;;
+
+      *) error "unexpected option '$option'" ;;
+    esac
+  done
+
+  command="$1"; shift
+  command_arguments=("$@")
+
+  set-vars
+}
+
+set-in() {
+  local val="$1"
+  if [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
+    export HITHER_DBNAME="${BASH_REMATCH[1]}"
+    export HITHER_FROM="${BASH_REMATCH[2]}"
+  else
+    if [[ "$val" =~ ^https?: ]]; then
+      export HITHER_URL="$val"
+    else
+      export HITHER_IN="$val"
+    fi
+    set-var HITHER_FROM
+  fi
+}
+
+set-out() {
+  local val="$1"
+  if [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
+    export HITHER_DBNAME="${BASH_REMATCH[1]}"
+    export HITHER_TO="${BASH_REMATCH[2]}"
+  else
+    if [[ "$val" =~ ^https?: ]]; then
+      die "Can't use URL for output"
+    fi
+    export HITHER_OUT="$val"
+    set-var HITHER_TO
+  fi
+}
+
+# Support pg://user:password@hostname:port/db?opt=val
+set-var() {
+  local var="$1"
+  if [[ "$val" =~ \.(hsd|hsm|hdf|sql)$ ]]; then
+    printf -v $var "${BASH_REMATCH[1]}"
+  elif [[ "$val" =~ \.sqlite3$ ]]; then
+    printf -v $var lite
+  fi
+  export $var
+}
+
+set-vars() {
+  in="$HITHER_IN"
+  out="$HITHER_OUT"
+  to="$HITHER_TO"
+  from="$HITHER_FROM"
+}
+
+check-profile() {
+  if [ -n "$HITHER_PROFILE" ]; then
+    [ -f "$HITHER_PROFILE" ] ||
+      die "Profile '$HITHER_PROFILE' is not a file"
+    source "$HITHER_PROFILE"
+  fi
+}
+
+assert-command() {
+  local missing=false
+  local cmd
+  for cmd in $@; do
+    if ! $(type $cmd &> /dev/null); then
+      echo "Required command not found: '$cmd'"
+      missing=true
+    fi
+  done
+  if "$missing"; then exit 1; fi
+}
+
+read-input() {
+  if [ -n "$HITHER_URL" ]; then
+    curl -Ls "$HITHER_URL"
+  elif [ -n "$HITHER_IN" ]; then
+    cat "$HITHER_IN"
+  else
+    cat
+  fi
+}
+
+write-output() {
+  if [ -n "$HITHER_OUT" ]; then
+    cat > "$HITHER_OUT"
+  else
+    cat
+  fi
+}
+
+[ "${BASH_SOURCE[0]}" != "$0" ] || main "$@"
+
+# vim: set lisp:

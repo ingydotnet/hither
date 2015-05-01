@@ -1,0 +1,60 @@
+#!/usr/bin/env coffee
+
+pg = require 'pg-json-schema-export'
+yaml = require 'js-yaml'
+crypto = require 'crypto'
+
+host = 'localhost'
+port = 5432
+env = process.env
+user = env.HITHER_USER || env.USER
+password = env.HITHER_PASSWORD
+dbname = env.HITHER_DBNAME or
+  throw "HITHER_DBNAME not defined"
+
+pg_info =
+  host: host
+  port: port
+  user: user
+  password: password
+  database: dbname
+
+do ->
+  pg.toJSON(pg_info, 'public')
+    .then (data)->
+      hsd = make_hsd data
+      write_hsd hsd
+      process.exit(0)
+
+write_hsd = (hsd)->
+  shasum = crypto.createHash 'sha1'
+  shasum.update yaml.dump hsd
+  hsd.info.hsid = shasum.digest 'hex'
+  process.stdout.write yaml.dump hsd
+
+make_hsd = (data)->
+  hsd =
+    info:
+      type: 'postgres'
+      name: dbname
+    table: []
+  for name, table of data.tables
+    hsd.table.push
+      name: table.table_name
+      cols: make_cols table.columns
+  hsd
+
+make_cols = (columns)->
+  cols = []
+  for name, column of columns
+    col =
+      name: column.column_name
+      type: column.data_type
+    cols.push col
+    col.type = 'timestamp' \
+      if col.type? and col.type.match '^timestamp'
+    col.type = 'array' \
+      if col.type == 'ARRAY'
+    col.need = true \
+      unless column.is_nullable
+  cols

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/hither"
+
+[ -n "$HITHER_DBNAME" ] ||
+  die "Command requires a database name"
+
+psql -c "drop database $HITHER_DBNAME" &>/dev/null || true
+
+read-input |
+  perl -pe 's/(booktown )postgres/$1/' |
+  psql &>/dev/null
+
+# Dump books table to make sure it worked:
+psql -d $HITHER_DBNAME -c 'select * from books' 2>/dev/null
+
+# vim: set ft=sh:

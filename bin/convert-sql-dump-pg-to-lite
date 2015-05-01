@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+. $(dirname $0)/setup.bash \
+  sudo \
+  profile \
+
+PGD -s -t authors booktown
+
+# vim: set ft=sh:
