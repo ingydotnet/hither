@@ -4,9 +4,10 @@ pg = require 'pg-json-schema-export'
 yaml = require 'js-yaml'
 crypto = require 'crypto'
 
-host = 'localhost'
-port = 5432
 env = process.env
+
+host = env.HITHER_HOST || 'localhost'
+port = env.HITHER_PORT || 5432
 user = env.HITHER_USER || env.USER
 password = env.HITHER_PASSWORD
 dbname = env.HITHER_DBNAME or
