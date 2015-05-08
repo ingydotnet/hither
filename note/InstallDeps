@@ -1,0 +1,4 @@
+- node v0.10
+  - npm install pg-json-schema-export
+  - npm install coffee-script
+
