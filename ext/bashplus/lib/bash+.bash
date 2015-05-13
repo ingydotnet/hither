@@ -20,7 +20,7 @@ set -e
 BASHPLUS_VERSION='0.0.6'
 
 @() { echo "$@"; }
-bash+:export:std() { @ use die warn; }
+bash+:export:std() { @ use die warn error; }
 
 # Source a bash library call import on it:
 bash+:use() {
@@ -80,6 +80,11 @@ bash+:die() {
     msg=" at line %d in %s of %s"
   printf "$msg\n" ${c[@]} >&2
   exit 1
+}
+
+bash+:error() {
+  echo "$1"$'\n' >&2
+  exit "${2:-1}"
 }
 
 bash+:warn() {
