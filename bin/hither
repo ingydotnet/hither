@@ -51,7 +51,7 @@ main() {
   elif $(type "hither-$command" &>/dev/null); then
     "hither-$command" "${command_arguments[@]}"
   else
-    die "Unsupported hither command: '$command'\n"
+    error "Unsupported hither command: '$command'\n"
   fi
 }
 
@@ -138,7 +138,10 @@ get-opts() {
 
 set-in() {
   local val="$1"
-  if [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
+  if [[ "$val" =~ ^(pg|my|lite): ]]; then
+    export HITHER_FROM="${BASH_REMATCH[1]}"
+    set-from-url "$val"
+  elif [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
     export HITHER_DBNAME="${BASH_REMATCH[1]}"
     export HITHER_FROM="${BASH_REMATCH[2]}"
   else
@@ -153,19 +156,55 @@ set-in() {
 
 set-out() {
   local val="$1"
-  if [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
+  if [[ "$val" =~ ^(pg|my|lite): ]]; then
+    export HITHER_TO="${BASH_REMATCH[1]}"
+    set-from-url "$val"
+  elif [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
     export HITHER_DBNAME="${BASH_REMATCH[1]}"
     export HITHER_TO="${BASH_REMATCH[2]}"
   else
     if [[ "$val" =~ ^https?: ]]; then
-      die "Can't use URL for output"
+      error "Can't use URL for output"
     fi
     export HITHER_OUT="$val"
     set-var HITHER_TO
   fi
 }
 
-# Support pg://user:password@hostname:port/db?opt=val
+set-from-url() {
+  local url="$1"
+  local inpout="$2"
+  [[ "$url" =~ ^(pg|my|lite): ]] ||
+    error "Invalid URL scheme in $url"
+  export HITHER_DBTYPE="${BASH_REMATCH[1]}"
+  url="${url/${BASH_REMATCH[1]}:/}"
+  url="${url#//}"
+  if [[ "$url" =~ (.*?)@ ]]; then
+    url="${url#*@}"
+    userpass="${BASH_REMATCH[1]}"
+    if [[ "$userpass" =~ ^(.*):(.*)$ ]]; then
+      export HITHER_USER="${BASH_REMATCH[1]}"
+      export HITHER_PASSWORD="${BASH_REMATCH[2]}"
+    else
+      export HITHER_USER="$userpass"
+    fi
+  fi
+  if [[ "$url" =~ ([^/]+)/(.*) ]]; then
+    url="${url%%/*}"
+    local path="${BASH_REMATCH[2]}"
+    if [[ "$path" =~ \? ]]; then
+      error "Hither URL doesn't support '?options' yet."
+    fi
+    export HITHER_DBNAME="$path"
+  fi
+  if [[ "$url" =~ ^(.*):([0-9]{1,5})$ ]]; then
+    export HITHER_HOST="${BASH_REMATCH[1]}"
+    export HITHER_PORT="${BASH_REMATCH[2]}"
+  else
+    export HITHER_HOST="$url"
+  fi
+}
+
 set-var() {
   local var="$1"
   if [[ "$val" =~ \.(hsd|hmd|hdf|sql)$ ]]; then
@@ -181,12 +220,20 @@ set-vars() {
   out="$HITHER_OUT"
   to="$HITHER_TO"
   from="$HITHER_FROM"
+  [ -n "$from" ] ||
+    error "Can't determine FROM value. Try using '--from=…'."
+  [ -n "$to" ] ||
+    error "Can't determine TO value. Try using '--to=…'."
+  [[ "$from" =~ ^(pg|my|lite|sql|csv)$ ]] ||
+    error "Invalid FROM value: '$from'. Want 'pg|my|lite|sql|csv'."
+  [[ "$to" =~ ^(pg|my|lite|sql|csv)$ ]] ||
+    error "Invalid TO value: '$to'. Want 'pg|my|lite|sql|csv'."
 }
 
 check-profile() {
   if [ -n "$HITHER_PROFILE" ]; then
     [ -f "$HITHER_PROFILE" ] ||
-      die "Profile '$HITHER_PROFILE' is not a file"
+      error "Profile '$HITHER_PROFILE' is not a file"
     source "$HITHER_PROFILE"
   fi
 }
