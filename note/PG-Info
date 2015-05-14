@@ -6,14 +6,16 @@ probably create a pguser that matches your `$USER`. Run these commands:
   sudo -u postgres createuser -s -d -r $USER
   createdb
 
+== Using the `postgres` User
+
 You can also run commands as the `postgres` user:
 
   sudo -u postgres psql
 
 Maybe setup these aliases:
 
-    alias psql='sudo -u postgres psql '
-    alias pg_dump='sudo -u postgres pg_dump '
+  alias psql='sudo -u postgres psql '
+  alias pg_dump='sudo -u postgres pg_dump '
 
 == Common Commandline Operations
 
