@@ -6,7 +6,7 @@ use Test::More
 h_output="$(hither -h || true)"
 help_output="$(hither --help || true)"
 
-is `echo "$h_output" | wc -l` 28 \
+is `echo "$h_output" | wc -l` 29 \
   '-h output is 14 lines'
 is "$h_output" "$help_output" \
   '-h is same output as --help'

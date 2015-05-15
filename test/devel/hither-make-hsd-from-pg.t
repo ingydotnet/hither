@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 
 source "$(dirname $0)/../setup"
+source "$(dirname $0)/setup"
 use Test::More
 
-run() {
-  hither load \
-      --in=http://www.commandprompt.com/ppbook/booktown.sql \
-      --out=pg://localhost:5432/booktown
-}; RUN
-
-is "$retval" "0" "'hither load' return code is 0"
-[ $retval -eq 0 ] || echo "$stdout$stderr"
+assert-booktown-db
 
 run() {
-  psql -d booktown -c 'select * from books'
+  hither make --in=pg://ingy:pa55w0rd@localhost:5432/booktown --to=hsd
 }; RUN
 
-like "$stdout" "(15 rows)" "booktown books table has 15 rows"
+ok "$retval" "Make HSD from pg was successful"
+
+like "$stdout" "name: booktown" "HSD has table name"
 
 done_testing
 
-# vim: set sw=2:
+# vim: set lisp sw=2:

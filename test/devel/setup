@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+
+assert-booktown-db() {
+  if `! pg-db-exists booktown`; then
+    run() {
+      hither load \
+          --in=test/devel/booktown.sql \
+          --out=pg://localhost:5432/booktown
+    }; RUN
+  fi
+  if `! pg-db-exists booktown`; then
+    die "Can't create booktown db"
+  fi
+}
+
+# vim: set sw=2:

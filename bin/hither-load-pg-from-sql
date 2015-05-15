@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/hither"
 
 [ -n "$HITHER_OUT_DBNAME" ] ||

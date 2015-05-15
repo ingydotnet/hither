@@ -30,6 +30,7 @@ i,in=       Input: File, URL or DB
 o,out=      Output: File or DB
 f,from=     Input data/database/hither type
 t,to=       Output data/datbase/hither type
+w,with=     Alternative method for make
  
 p,profile=  Shell profile to be sourced
 m,metadata= Data file w/ info to make targets
@@ -65,7 +66,11 @@ command:load() {
 }
 
 command:make() {
-  "hither-make-$to-from-$from" "$@"
+  if [ -n "$HITHER_BY" ]; then
+    "hither-make-$to-from-$from-by-$by" "$@"
+  else
+    "hither-make-$to-from-$from" "$@"
+  fi
 }
 
 init-env() {
@@ -109,6 +114,10 @@ get-opts() {
         ;;
       -t)
         export HITHER_TO="$1"
+        shift
+        ;;
+      -w)
+        export HITHER_WITH="$1"
         shift
         ;;
 
@@ -250,8 +259,8 @@ set-vars() {
     error "Can't determine TO value. Try using '--to=…'."
   [[ "$from" =~ ^(pg|my|lite|sql|csv)$ ]] ||
     error "Invalid FROM value: '$from'. Want 'pg|my|lite|sql|csv'."
-  [[ "$to" =~ ^(pg|my|lite|sql|csv)$ ]] ||
-    error "Invalid TO value: '$to'. Want 'pg|my|lite|sql|csv'."
+  [[ "$to" =~ ^(pg|my|lite|hsd|sql|csv)$ ]] ||
+    error "Invalid TO value: '$to'. Want 'pg|my|lite|hsd|sql|csv'."
 }
 
 check-profile() {
@@ -293,7 +302,7 @@ write-output() {
 }
 
 pg-db-exists() {
-  pg_dump -s "$1"
+  pg_dump -s "${1:-undefined}" &>/dev/null
 }
 
 RUN() {

@@ -6,12 +6,12 @@ crypto = require 'crypto'
 
 env = process.env
 
-host = env.HITHER_HOST || 'localhost'
-port = env.HITHER_PORT || 5432
-user = env.HITHER_USER || env.USER
-password = env.HITHER_PASSWORD
-dbname = env.HITHER_DBNAME or
-  throw "HITHER_DBNAME not defined"
+host = env.HITHER_IN_HOST || 'localhost'
+port = env.HITHER_IN_PORT || 5432
+user = env.HITHER_IN_USER || env.USER
+password = env.HITHER_IN_PASSWORD
+dbname = env.HITHER_IN_DBNAME or
+  throw "HITHER_IN_DBNAME not defined"
 
 pg_info =
   host: host
