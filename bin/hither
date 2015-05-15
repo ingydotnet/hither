@@ -44,6 +44,7 @@ main() {
 
   init-env
   get-opts "$@"
+  set-vars
   check-profile
 
   if can "command:$command"; then
@@ -130,63 +131,90 @@ get-opts() {
     esac
   done
 
-  command="$1"; shift
+  command="$1"; shift || true
   command_arguments=("$@")
-
-  set-vars
 }
 
 set-in() {
   local val="$1"
-  if [[ "$val" =~ ^(pg|my|lite): ]]; then
-    export HITHER_FROM="${BASH_REMATCH[1]}"
-    set-from-url "$val"
+  export HITHER_IN="$val"
+  local in_out=IN
+  if [[ "$val" =~ ^https?: ]]; then
+    set-export URL "$val"
+    set-var-from-ext "$val" IN
+  elif [[ "$val" =~ ^([a-z]+):// ]]; then
+    set-vars-from-conninfo-uri "$val" IN
   elif [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
-    export HITHER_DBNAME="${BASH_REMATCH[1]}"
+    set-export DBNAME "${BASH_REMATCH[1]}"
     export HITHER_FROM="${BASH_REMATCH[2]}"
   else
-    if [[ "$val" =~ ^https?: ]]; then
-      export HITHER_URL="$val"
-    else
-      export HITHER_IN="$val"
-    fi
-    set-var HITHER_FROM
+    set-var-from-ext "$val" IN
   fi
 }
 
 set-out() {
   local val="$1"
-  if [[ "$val" =~ ^(pg|my|lite): ]]; then
-    export HITHER_TO="${BASH_REMATCH[1]}"
-    set-from-url "$val"
-  elif [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
-    export HITHER_DBNAME="${BASH_REMATCH[1]}"
-    export HITHER_TO="${BASH_REMATCH[2]}"
-  else
-    if [[ "$val" =~ ^https?: ]]; then
+  if [[ "$val" =~ ^https?: ]]; then
       error "Can't use URL for output"
-    fi
-    export HITHER_OUT="$val"
-    set-var HITHER_TO
+  elif [[ "$val" =~ ^(pg|my|lite): ]]; then
+    set-vars-from-conninfo-uri "$val" OUT
+  elif [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
+    set-var-from-ext "$val" OUT
   fi
 }
 
-set-from-url() {
+set-var-from-ext() {
+  local path="$1"
+  local in_out="$2"
+  local to_from= dbtype=
+  [ "$in_out" == IN ] && to_from=HITHER_FROM || to_from=HITHER_TO
+  if [[ "$path" =~ ^(.*)\.(pg|postgres|postgresql|my|mysql|lite|sqlite3?)$ ]]; then
+    set-export DBNAME "${BASH_REMATCH[1]}"
+    dbtype="${BASH_REMATCH[2]}"
+    if [[ "$dbtype" =~ ^(pg|postgres|postgresql)$ ]]; then
+      dbtype=pg
+    elif [[ "$dbtype" =~ ^(my|mysql)$ ]]; then
+      dbtype=my
+    elif [[ "$dbtype" =~ ^(lite|sqlite)$ ]]; then
+      dbtype=lite
+    else
+      die "Unknown database type in URI: '$dbtype'"
+    fi
+  elif [[ "$path" =~ \.(hsd|hmd|hdf|sql)$ ]]; then
+    dbtype="${BASH_REMATCH[1]}"
+  fi
+  printf -v "$to_from" "$dbtype"
+  export "$to_from"
+}
+
+# http://www.postgresql.org/docs/9.4/static/libpq-connect.html#AEN41094
+# postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]
+set-vars-from-conninfo-uri() {
   local url="$1"
-  local inpout="$2"
-  [[ "$url" =~ ^(pg|my|lite): ]] ||
-    error "Invalid URL scheme in $url"
-  export HITHER_DBTYPE="${BASH_REMATCH[1]}"
+  local in_out="$2"
+  local to_from= dbtype=
+  [ "$in_out" == IN ] && to_from=HITHER_FROM || to_from=HITHER_TO
+  [[ "$val" =~ ^([a-z]+):// ]] || die
+  dbtype="${BASH_REMATCH[1]}"
+  if [[ "$dbtype" =~ ^(pg|postgres|postgresql)$ ]]; then dbtype=pg
+  elif [[ "$dbtype" =~ ^(my|mysql)$ ]]; then dbtype=my
+  elif [[ "$dbtype" =~ ^(lite|sqlite)$ ]]; then dbtype=lite
+  else
+    die "Unknown database type in URI: '$dbtype'"
+  fi
+  printf -v "$to_from" "$dbtype"
+  export "$to_from"
+  set-export TYPE "$dbtype"
   url="${url/${BASH_REMATCH[1]}:/}"
   url="${url#//}"
   if [[ "$url" =~ (.*?)@ ]]; then
     url="${url#*@}"
     userpass="${BASH_REMATCH[1]}"
     if [[ "$userpass" =~ ^(.*):(.*)$ ]]; then
-      export HITHER_USER="${BASH_REMATCH[1]}"
-      export HITHER_PASSWORD="${BASH_REMATCH[2]}"
+      set-export USER "${BASH_REMATCH[1]}"
+      set-export PASSWORD "${BASH_REMATCH[2]}"
     else
-      export HITHER_USER="$userpass"
+      set-export USER "$userpass"
     fi
   fi
   if [[ "$url" =~ ([^/]+)/(.*) ]]; then
@@ -195,24 +223,20 @@ set-from-url() {
     if [[ "$path" =~ \? ]]; then
       error "Hither URL doesn't support '?options' yet."
     fi
-    export HITHER_DBNAME="$path"
+    set-export DBNAME "$path"
   fi
   if [[ "$url" =~ ^(.*):([0-9]{1,5})$ ]]; then
-    export HITHER_HOST="${BASH_REMATCH[1]}"
-    export HITHER_PORT="${BASH_REMATCH[2]}"
+    set-export HOST "${BASH_REMATCH[1]}"
+    set-export PORT "${BASH_REMATCH[2]}"
   else
-    export HITHER_HOST="$url"
+    set-export HOST "$url"
   fi
 }
 
-set-var() {
-  local var="$1"
-  if [[ "$val" =~ \.(hsd|hmd|hdf|sql)$ ]]; then
-    printf -v $var "${BASH_REMATCH[1]}"
-  elif [[ "$val" =~ \.sqlite3$ ]]; then
-    printf -v $var lite
-  fi
-  export $var
+set-export() {
+  local var="HITHER_${in_out}_$1" val="$2"
+  printf -v "$var" "$val"
+  export "$var"
 }
 
 set-vars() {
@@ -251,8 +275,8 @@ assert-command() {
 }
 
 read-input() {
-  if [ -n "$HITHER_URL" ]; then
-    curl -Ls "$HITHER_URL"
+  if [ -n "$HITHER_IN_URL" ]; then
+    curl -Ls "$HITHER_IN_URL"
   elif [ -n "$HITHER_IN" ]; then
     cat "$HITHER_IN"
   else
@@ -266,6 +290,22 @@ write-output() {
   else
     cat
   fi
+}
+
+pg-db-exists() {
+  pg_dump -s "$1"
+}
+
+RUN() {
+  unset out err ret
+  eval "$(
+    run > >(out=$(cat); typeset -p out) \
+      2> >(err=$(cat); typeset -p err);
+    ret=$?; typeset -p ret
+  )"
+  stdout=$out
+  stderr=$err
+  retval=$ret
 }
 
 [ "${BASH_SOURCE[0]}" != "$0" ] || main "$@"

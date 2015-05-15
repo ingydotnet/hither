@@ -9,3 +9,12 @@ export BASHLIB="`
 `"
 export PATH="$BASHLIB:$PATH"
 source bash+ :std
+source bin/hither
+
+reset-env() {
+  for e in `env`; do
+    if [[ "$e" =~ ^HITHER_ ]]; then
+      unset "${e%=*}"
+    fi
+  done
+}
