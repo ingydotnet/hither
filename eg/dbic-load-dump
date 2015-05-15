@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+DUMP_DIR=/tmp/dbicdump
+NAMESPACE=TestSchema
+
+rm -fr $DUMP_DIR
+
+dbicdump -o \
+        dump_directory=$DUMP_DIR \
+        $NAMESPACE \
+        dbi:Pg:database=booktown \
+        $USER pa55w0rd \
+        &>/dev/null
+
+perl -p -0e 's/^=\w(.*?\n)=cut\n\n?//gsm;' \
+        -e 's/^#.*\n//gm;' \
+        -e 's/\n+/\n/g;' \
+        -e 's/use (utf8|warnings|strict);\n//g;' \
+        -e 's/^1;//m;' \
+        $DUMP_DIR/$NAMESPACE/Result/*
