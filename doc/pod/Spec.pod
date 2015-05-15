@@ -82,24 +82,20 @@ The C<hither> command has many actions. Here are some examples:
 
 =over
 
-=item C<< hither make --in=<hsd1> -in=<hsd2> --to=hmd >>
+=item C<< hither --in=<hsd1> -in=<hsd2> --to=hmd >>
 
 Produce a Hither migration from 2 Hither schemas definitions.
 
-=item C<hither make …>
+=item C<hither --in=… --to=…>
 
 Generate things from things. Useful for generating ORM code. Examples:
 
-    hither make --in=database.hsd --out=dbix
-    hither make --in=database.hsd --out=django
+    hither --in=database.hsd --to=dbix
+    hither --in=database.hsd --to=django
 
-=item C<hither load …>
+=item C<hither --in=dump.sql --to=…>
 
 Import a database from a source. Could be a dump or another database.
-
-=item C<hither info …>
-
-Show info about a data source.
 
 =back
 
@@ -182,6 +178,11 @@ For starters, heavy use will be made of:
 This module does a lot of transformations. It is a good starting point. (It is
 the basis of much of DBIx::Class::DeploymentHandler).
 
+=item C<DBIx::Class::Schema::Loader>
+
+Generates DBIx::Class modules from database schema. Use this to get schema
+info we need.
+
 =back
 
 =head3 Django migrate
@@ -223,9 +224,9 @@ The primary focus for now, is Perl's C<DBIx::Class>.
 
 =head2 Sample Usage
 
-    hither load --in=http://opendata.org/some.csv --out=foo.pg
-    hither make --in=foo.pg --out=some.hsd
-    hither make some1.hsd some2.hsd --out=migrate.hmd
-    hither make --in=migrate.hmd --out=sql
+    hither --in=http://opendata.org/some.csv --out=pg://localhost/foo
+    hither --in=foo.pg --out=some.hsd
+    hither --in=some1.hsd --in=some2.hsd --out=migrate.hmd
+    hither --in=migrate.hmd --to=sql
 
 =cut

@@ -11,7 +11,7 @@ DBI=dbi:Pg
 rm -fr $DUMP_DIR
 
 if `! pg-db-exists $DBNAME`; then
-  hither load --in=test/devel/booktown.sql --to=pg
+  hither --in=test/devel/booktown.sql --to=pg
 fi
 
 dbicdump -o \

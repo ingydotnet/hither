@@ -10,8 +10,11 @@ help:
 test:
 	prove -vr test/
 
-doc:
+doc: ReadMe.pod
 	make -C doc/
+
+ReadMe.pod: doc/Hither.swim
+	swim --to=pod --complete --wrap $< > $@
 
 clean:
 	rm -fr django

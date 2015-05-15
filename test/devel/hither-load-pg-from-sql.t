@@ -12,11 +12,11 @@ ok "`! pg-db-exists booktown`" "booktown db doesn't exist"
 run() {
   hither \
       --in=test/devel/booktown.sql \
-      --out=pg://localhost:5432/booktown
+      --out=pg://$USER:h1th3r@localhost:5432/booktown
 }; RUN
+(exit $retval) || die "$stdout$stderr"
 
-ok "$retval" "'hither load' return code is 0"
-(exit $retval) || echo "$stdout$stderr"
+ok "$retval" "'hither' return code is 0"
 
 ok "`pg-db-exists booktown`" "booktown db exists"
 

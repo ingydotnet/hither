@@ -7,7 +7,7 @@ use Test::More
 assert-booktown-db
 
 run() {
-  hither --in=pg://ingy:pa55w0rd@localhost:5432/booktown --to=hsd
+  hither --in=pg://$USER:h1th3r@localhost:5432/booktown --to=hsd
 }; RUN
 
 ok "$retval" "Make HSD from pg was successful"

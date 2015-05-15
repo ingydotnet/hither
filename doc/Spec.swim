@@ -30,24 +30,20 @@ Hither's primary goals are:
 
 The `hither` command has many actions. Here are some examples:
 
-- `hither make --in=<hsd1> -in=<hsd2> --to=hmd`
+- `hither --in=<hsd1> -in=<hsd2> --to=hmd`
 
   Produce a Hither migration from 2 Hither schemas definitions.
 
-- `hither make …`
+- `hither --in=… --to=…`
 
   Generate things from things. Useful for generating ORM code. Examples:
 
-    hither make --in=database.hsd --out=dbix
-    hither make --in=database.hsd --out=django
+    hither --in=database.hsd --to=dbix
+    hither --in=database.hsd --to=django
 
-- `hither load …`
+- `hither --in=dump.sql --to=…`
 
   Import a database from a source. Could be a dump or another database.
-
-- `hither info …`
-
-  Show info about a data source.
 
 == Data Sources and Targets
 
@@ -108,6 +104,11 @@ For starters, heavy use will be made of:
   This module does a lot of transformations. It is a good starting point. (It
   is the basis of much of DBIx::Class::DeploymentHandler).
 
+- `DBIx::Class::Schema::Loader`
+
+  Generates DBIx::Class modules from database schema. Use this to get schema
+  info we need.
+
 === Django migrate
 
 Pythons Django MVC framework has a built-in database migration strategy and
@@ -143,8 +144,8 @@ The primary focus for now, is Perl's `DBIx::Class`.
 
 == Sample Usage
 
-  hither load --in=http://opendata.org/some.csv --out=foo.pg
-  hither make --in=foo.pg --out=some.hsd
-  hither make some1.hsd some2.hsd --out=migrate.hmd
-  hither make --in=migrate.hmd --out=sql
+  hither --in=http://opendata.org/some.csv --out=pg://localhost/foo
+  hither --in=foo.pg --out=some.hsd
+  hither --in=some1.hsd --in=some2.hsd --out=migrate.hmd
+  hither --in=migrate.hmd --to=sql
 

@@ -8,12 +8,12 @@ Database Munging Swiss Army Chainsaw
 = Synopsis
 
   # Load a sample Postgres database
-  > hither load --in=http://www.commandprompt.com/ppbook/booktown.sql \
-                --out=booktown.pg
+  > hither --in=http://www.commandprompt.com/ppbook/booktown.sql \
+           --out=pg://localhost/booktown
   # Generate a Hither Schema Definition
-  > hither make --in=booktown.pg --out=schema1.hsd
+  > hither --in=booktown.pg --out=schema1.hsd
   # Generate an SQL migration
-  > hither make --in=schema1.hsd --in=schema2.hsd --to=sql > migration.sql
+  > hither --in=schema1.hsd --in=schema2.hsd --to=sql > migration.sql
 
 = Description
 
