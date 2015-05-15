@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname $0)/devel/setup"
+source "$(dirname $0)/setup"
 use Test::More
 
 source bin/hither

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname $0)/setup"
+source "$(dirname $0)/../setup"
 source "$(dirname $0)/setup.d/django" # -R
 use Test::More
 
