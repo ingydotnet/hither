@@ -2,7 +2,7 @@
 
 set -e
 
-TMP="$(mktemp)"
+TMP="$(mktemp -t hither-XXXXXXXX)"
 
 error() {
   cat $TMP | grep -v 'could not change'

@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
 source bin/hither
+export PATH="$PWD/bin:$PATH"
 
 DBNAME=booktown
 DUMP_DIR=/tmp/dbicdump
 NAMESPACE=TestSchema
 PASSWORD=pa55w0rd
 DBI=dbi:Pg
+
+
 
 rm -fr $DUMP_DIR
 
