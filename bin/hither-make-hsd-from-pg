@@ -2,7 +2,7 @@
 
 source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/hither"
 
-bin/pg-schema-to-json | write-output
+bin/util-pg-schema-to-json | write-output
 
 # vim: set ft=sh:
 
