@@ -1,15 +1,24 @@
 #!/usr/bin/env bash
 
+source bin/hither
+
+DBNAME=booktown
 DUMP_DIR=/tmp/dbicdump
 NAMESPACE=TestSchema
+PASSWORD=pa55w0rd
+DBI=dbi:Pg
 
 rm -fr $DUMP_DIR
+
+if `! pg-db-exists $DBNAME`; then
+  hither load --in=test/devel/booktown.sql --to=pg
+fi
 
 dbicdump -o \
         dump_directory=$DUMP_DIR \
         $NAMESPACE \
-        dbi:Pg:database=booktown \
-        $USER pa55w0rd \
+        $DBI:database=$DBNAME \
+        $USER $PASSWORD \
         &>/dev/null
 
 perl -p -0e 's/^=\w(.*?\n)=cut\n\n?//gsm;' \
