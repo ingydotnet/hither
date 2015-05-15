@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -e
+
+TMP="$(mktemp)"
+
+error() {
+  cat $TMP | grep -v 'could not change'
+  rm -f "$TMP"
+  exit $1
+}
+
+(
+  set -x
+  sudo -u postgres psql -c "drop database $USER" &>$TMP
+) || error $?
+
+(
+  set -x
+  sudo -u postgres psql -c "drop role $USER" &>$TMP
+) || error $?
+
+rm -f "$TMP"
+
+# vim: set ft=sh:

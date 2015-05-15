@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -e
+
+TMP="$(mktemp)"
+
+error() {
+  cat $TMP | grep -v 'could not change'
+  rm -f "$TMP"
+  exit 1
+}
+
+(
+  set -x
+  sudo -u postgres createuser -s -d -r $USER 2>$TMP
+) || error $?
+
+(
+  set -x
+  sudo -u postgres createdb $USER 2>$TMP
+) || error $?
+
+echo
+echo "   ********** SET THE NEW PASSWORD TO 'h1th3r' WHEN PROMPTED **********"
+echo
+
+(
+  set -x
+  sudo -u postgres psql -c "\\password $USER" 2>/dev/null
+) || error
+
+rm -f "$TMP"
+
+# vim: set ft=sh:
