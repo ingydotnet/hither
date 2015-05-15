@@ -9,28 +9,21 @@ source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/bash+.bash"
 bash+:import :std can
 
 OPTIONS_SPEC="\
-hither <command> <options> <arguments>
+hither [<action>] <options> <arguments>
 
-The most commonly used commands:
-  load      Load a database
-  dump      Dump a database
-  make      Generate Hither files:
-            - 'hsd' Hither Schema Definition
-            - 'hmd' Hither Migration Definition
-            - 'hdf' Hither Data Fixture
-
-See 'hither help' for more help.
+Try 'hither help' for more help.
 
 Options:
 --
-h           Show the command summary
-help        Browse the complete 'hither' documentation
+h,help      Show the hither usage summary
  
 i,in=       Input: File, URL or DB
 o,out=      Output: File or DB
 f,from=     Input data/database/hither type
 t,to=       Output data/datbase/hither type
-w,with=     Alternative method for make
+ 
+a,action=   Explicit hither action/command verb
+w,with=     Alternative methodology for action
  
 p,profile=  Shell profile to be sourced
 m,metadata= Data file w/ info to make targets
@@ -48,28 +41,21 @@ main() {
   set-vars
   check-profile
 
-  if can "command:$command"; then
-    "command:$command" "${command_arguments[@]}"
-  elif $(type "hither-$command" &>/dev/null); then
-    "hither-$command" "${command_arguments[@]}"
-  else
-    error "Unsupported hither command: '$command'\n"
+  if [ -n "$HITHER_ACTION" ]; then
+    if can "action:$HITHER_ACTION"; then
+      "action:$HITHER_ACTION" "${action_arguments[@]}"
+      return
+    elif $(type "hither-$HITHER_ACTION" &>/dev/null); then
+      "hither-$HITHER_ACTION" "${action_arguments[@]}"
+      return
+    fi
   fi
-}
 
-command:help() {
-  exec man hither
-}
-
-command:load() {
-  "hither-load-$to-from-$from" "$@"
-}
-
-command:make() {
-  if [ -n "$HITHER_BY" ]; then
-    "hither-make-$to-from-$from-by-$by" "$@"
+  create-action-command
+  if $(type "$command" &>/dev/null); then
+    "$command" "${action_arguments[@]}"
   else
-    "hither-make-$to-from-$from" "$@"
+    error "Unsupported hither action: '$command'\n"
   fi
 }
 
@@ -116,6 +102,11 @@ get-opts() {
         export HITHER_TO="$1"
         shift
         ;;
+
+      -a)
+        export HITHER_ACTION="$1"
+        shift
+        ;;
       -w)
         export HITHER_WITH="$1"
         shift
@@ -140,8 +131,13 @@ get-opts() {
     esac
   done
 
-  command="$1"; shift || true
-  command_arguments=("$@")
+  if [ -z "$HITHER_ACTION" ]; then
+    if [ $# -gt 0 ]; then
+      HITHER_ACTION="$1"; shift
+    fi
+  fi
+
+  action_arguments=("$@")
 }
 
 set-in() {
@@ -283,6 +279,20 @@ assert-command() {
   if "$missing"; then exit 1; fi
 }
 
+create-action-command() {
+  command="hither-"
+  if [ -n "$HITHER_ACTION" ]; then
+    command+="$HITHER_ACTION-"
+  fi
+  command+="$HITHER_FROM-to-$HITHER_TO"
+  if [ -n "$HITHER_WITH" ]; then
+    command+="with-$HITHER_WITH"
+  fi
+}
+
+#------------------------------------------------------------------------------
+# Helper utils. TODO move to lib/hither.bash or bin/hither.bash
+#------------------------------------------------------------------------------
 read-input() {
   if [ -n "$HITHER_IN_URL" ]; then
     curl -Ls "$HITHER_IN_URL"

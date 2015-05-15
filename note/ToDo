@@ -1,5 +1,13 @@
 To Do Next
 
+- Refactor subcommand into --action
+  - hither-[$action-]$from-to-$to[-with-$with]
+  - Rename commands
+- User/Password == hither:h1th3r
+  - Change all tests
+  - Script to make hither user
+    - eg/create-pg-hither-user (from postgres user)
+
 + Implement hither-hsd-from-pg using pg-schema-to-json
   - Need --profile support for PG_PASSWORD
 - Implement hsd-to-django-model

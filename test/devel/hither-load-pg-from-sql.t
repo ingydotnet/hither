@@ -10,7 +10,7 @@ fi
 ok "`! pg-db-exists booktown`" "booktown db doesn't exist"
 
 run() {
-  hither load \
+  hither \
       --in=test/devel/booktown.sql \
       --out=pg://localhost:5432/booktown
 }; RUN

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/hither"
+
+die "$0 not yet implemented"
+
+# vim: set ft=sh:
+
