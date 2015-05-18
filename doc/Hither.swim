@@ -10,15 +10,53 @@ Database Munging Swiss Army Chainsaw
   # Load a sample Postgres database
   > hither --in=http://www.commandprompt.com/ppbook/booktown.sql \
            --out=pg://localhost/booktown
+
   # Generate a Hither Schema Definition
-  > hither --in=booktown.pg --out=schema1.hsd
-  # Generate an SQL migration
-  > hither --in=schema1.hsd --in=schema2.hsd --to=sql > migration.sql
+  > hither --in=pg://localhost/booktown --out=schema1.hsd
+
+  # Generate a Hither Migration Definition
+  > hither --in=schema1.hsd --in=schema2.hsd --out=migrate-1-2.hmd
+
+  # Generate an SQL file for a migration
+  > hither --in=migrate-1-2.hmd --out=migrate-1-2.sql
+
+  # Apply a hither migration to a database
+  > hither --in=migrate-1-2.hmd --out=pg://localhost/booktown
 
 = Description
 
 Hither is a generic database manipulation tool. It does complicated and
 annoying database operations in simple and consistent manners.
+
+Hither considers a database to be in a given "state". The state is effectively
+the database's schema. Hither assigns an id to a state. A schema migration is
+simply going from one state to another state. Hither keeps the current state id
+in a table (called `hither` by default). This table also keeps track of the
+past migrations that have taken place.
+
+The migration logic between 2 states is specified by a Hither Migration
+Definition file. This file contains all the information to go from state A to
+state B, and also from state B to state A (reverse migration). Hither tries
+hard to generate as much of the HMD as it can, but requires human
+attention/modification for certain operations.
+
+Using this information, hither can (in theory) migrate database schemas between
+any 2 states. When it doesn't have enough information to do that, it will ask
+for the missing parts.
+
+Development projects (codebases) that use a database, need the database to be
+in a certain state. It may be the case that multiple dev teams are working on
+multiple branches that each need a different state. This is where Hither is of
+huge benefit. The codebase should identify (in code or config) the state it
+requires. If the Hither state of the DB is different than the state that the
+code wants, the codebase should refuse to connect to it, and give an error
+message telling the user the 2 states (codebase and database). Then the user
+can simply use Hither to migrate.
+
+== Support and Functionality
+
+Hither tries to be a general tool, helping with many common operations on all
+the popular databases. The folling sections, list the current support level:
 
 == Supported Databases
 
@@ -28,7 +66,7 @@ annoying database operations in simple and consistent manners.
 
 == Supported Dataset Sources
 
-* Databases above
+* Databases listed above
 * SQL dumps
 * CSV and TSV files
 * Hither fixture files (YAML)
@@ -36,8 +74,8 @@ annoying database operations in simple and consistent manners.
 == Supported I/O
 
 * File URLs (input only)
-* Database names
-* File paths
+* Database conninfo URLs
+* Disk file paths
 * STDIN / STDOUT
 
 == Supported Operations
@@ -45,7 +83,226 @@ annoying database operations in simple and consistent manners.
 * Load database from database source
 * Dump database to various formats
 * Extract database schema to HSD (Hither Schema Definition)
-* Generate migration from 2 HSDs
+* Generate migration (HMD) files from 2 HSDs
+* Generate SQL migration files from HMD files
+* Apply a migration to a DB (and update the `hither` table)
+
+= Command Line Usage
+
+Hither provides a single command line tool called `hither` that does all hither
+activities. The usage is:
+
+  hither <options>
+
+== `hither` Options
+
+Hither is mostly concerned with taking a data source in a given format (input),
+to a data target in another format (output). The primary options are thus:
+
+- `--input=` `-i`
+
+  The input data source. Can be a database, file, URL or STDIN.
+
+- `--output` `-o`
+
+  The output data target. Can be a database, file, URL or STDOUT.
+
+Hither supports a database connection info URL for `--input` and `--output`.
+See "Hither Connection URLs" below.
+
+Closely related are the options that say what format the data is in. Many times
+this is inferred from the file extension, or URL scheme but other times (like
+using STDIN/STDOUT) you need to specify the format explicitly with these
+options:
+
+- `--from` `-f`
+
+  The data format of the input. Things like `csv`, `pg` (postgresql), `sql`,
+  `hsd`, `hmd`, etc.
+
+- `--to` `-t`
+
+  The data format of the output. Things like `csv`, `pg`, `sql`, `hsd`, `hmd`,
+  etc.
+
+Each invocation of a `hither` command performs a single transformation. For
+instance `sql-to-pg` would load a PostgreSQL database from an SQL dump text.
+This is called an "action", and this particular action would be performed by an
+external program called `hither-sql-to-pg`.
+
+The *action* is almost always inferred from the *options*, but these options
+are sometimes needed:
+
+- `--action` `-a`
+
+  Specify an action explicitly. All actions are described below:
+
+- `--with` `-w`
+
+  In some cases an operation has multiple implementations. For instance the
+  `sql-to-pg` might have 2 implementations, one that uses `psql` and one that
+  uses `perl`. The option `--with=perl` would execute the program:
+  `hither-sql-to-pg-with-perl`.
+
+There are a 2 options that specify the location of extra information needed by
+some action commands:
+
+- `--profile` `-p`
+
+  The `hither` command puts all of its information in environment variables
+  before executing the action program. The `--profile` option points to a bash
+  file that is sourced; usually exporting `HITHER_*` environment variables
+  containing things like the database user and password. (These variables are
+  described below.)
+
+- `--metadata` `-m`
+
+  Points to a YAML or JSON file that contains extra data needed by some
+  actions.
+
+Finally, `hither` has 3 options for contralling its command output:
+
+- `--quiet` `-q`
+
+  Run in quiet mode. No output, except for errors.
+
+- `--verbose` `-v`
+
+  Be more noisy. Show what steps are happening during execution.
+
+- `--debug` `-D`
+
+  Spew tons of debug info. Usually turns on Bash's `set -x` option, which
+  prints every instruction before executing it.
+
+== Hither Connection URLs
+
+To connect to a database, you often need to specify theses things:
+
+* Database Type
+* Server Address
+* Server Port
+* Database Name
+* User Name
+* User Password
+
+Hither supports a URL format that allows one to say all this in one string:
+
+  type://user:password@server:port/dbname#opt1=val1;opt2=val2...
+
+For example:
+
+  pg://nate:pa55w0rd@localhost:5432/baseball_stats
+
+When some values are specified elsewhere, parts can be left out. Only `type`,
+`address` and `dbname` are required:
+
+  pg://localhost/baseball_stats
+
+== `hither` Actions
+
+- `sql-to-pg`
+
+  Load a Postgres DB from an SQL source file or URL. Will drop the DB first, if
+  it exists.
+
+- `pg-to-hsd`
+
+  Create an HSD file from a Postgres DB schema. Defaults to the `node`
+  implementation.
+
+- `pg-to-hsd-with-node`
+
+  Create an HSD file from a Postgres DB schema, using a node.js library.
+
+- `pg-to-hsd-with-dbic`
+
+  Create an HSD file from a Postgres DB schema, using Perl's
+  DBIx::Class::Schema::Loader.
+
+- `pg-to-dbic`
+
+  Create a set of DBIx::Class models from a Postgres DB.
+
+== The `HITHER_*` Environment Variables
+
+The `hither` command sets these environment variables before executing its
+action program. Most of these variables are either hither option overrides or
+database connection information, like `user`i, `password` and `dbname`.
+
+The `hither` command will use these variables if thy are already in the
+environment, or else the user can supply the information as command options,
+and `hither` will add them to the environment before executing the command.
+
+- `HITHER_ACTION`
+
+  The *action* verb, like `sql-to-pg`.
+
+- `HITHER_DBNAME`
+
+  The name of the database being accessed. For SQLite, this would be the name
+  of the database file without the file extension.
+
+- `HITHER_DEBUG`
+
+  Environment variable for `--debug` option.
+
+- `HITHER_FROM`
+
+  Environment variable for `--from=` option.
+
+- `HITHER_IN`
+
+  Hither input data source file or URL.
+
+- `HITHER_METADATA`
+
+  Environment variable for `--metadata` option.
+
+- `HITHER_OUT`
+
+  Hither output data source file or URL.
+
+- `HITHER_PASSWORD`
+
+  The database user's password.
+
+- `HITHER_PORT`
+
+  The port number that the database server is listening on.
+
+- `HITHER_PROFILE`
+
+  A bash file to be sourced, usually containing exports of environment
+  variables.
+
+- `HITHER_QUIET`
+
+  Environment variable for `--quiet` option.
+
+- `HITHER_SERVER`
+
+  The database server's IP address.
+
+- `HITHER_TO`
+
+  Environment variable for `--to=` option.
+
+- `HITHER_TYPE`
+
+  The database type: `pg` (Postgres), `my` (MySQL) or `lite` (SQLite).
+
+- `HITHER_USER`
+
+  The user name being used to access a database with user authentication.
+
+- `HITHER_VERBOSE`
+
+  Environment variable for `--verbose` option.
+
+= See Also
+
+* "Hither Specification"[https://github.com/ingydotnet/hither/blob/master/doc/pod/Spec.pod]
 
 = Copyright & License
 
