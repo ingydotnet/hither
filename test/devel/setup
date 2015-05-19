@@ -2,6 +2,7 @@
 
 set -e
 
+source test/setup
 source lib/hither.bash
 
 assert-booktown-db() {

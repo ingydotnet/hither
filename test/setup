@@ -2,13 +2,13 @@
 
 set -e
 
-export BASHLIB="`
-  find $PWD -type d |
-  grep -E '/(bin|lib)$' |
-  xargs -n1 printf "%s:"
-`"
-export PATH="$BASHLIB:$PATH"
-source bash+ :std
+export PATH="\
+$PWD/ext/bashplus/bin:\
+$PWD/ext/test-more-bash/lib:\
+$PATH
+"
+
+source ext/bashplus/bin/bash+ :std
 source lib/hither.bash
 
 reset-env() {

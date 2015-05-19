@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname $0)/../setup"
+source "$(dirname $0)/setup"
 use Test::More
 
 if `pg-db-exists booktown`; then
