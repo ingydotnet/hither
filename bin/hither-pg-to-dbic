@@ -2,8 +2,7 @@
 
 source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
 
-[ -n "$HITHER_DBNAME" ] ||
-  die "Command requires a database name"
+require-var HITHER_DBNAME
 
 run-psql -c "drop database $HITHER_DBNAME" &>/dev/null || true
 if [[ "$HITHER_IN" =~ ^https?: ]]; then
@@ -14,6 +13,5 @@ fi
 
 # Dump books table to make sure it worked:
 run-psql -d $HITHER_DBNAME -c 'select * from books' 2>/dev/null
-
 
 # vim: set ft=sh:

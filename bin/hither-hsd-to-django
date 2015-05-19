@@ -1,3 +1,7 @@
-#!/usr/bin/env perl
+#!/usr/bin/env bash
 
-# --out=foo/bar/models.py --to=django
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
+
+read-input | util-hsd-to-django # | write-output
+
+# vim: set ft=sh:

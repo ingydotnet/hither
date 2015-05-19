@@ -237,10 +237,9 @@ When some values are specified elsewhere, parts can be left out. Only `type`,
 
 == `hither` Actions
 
-- `sql-to-pg`
+- `hsd-to-django`
 
-  Load a Postgres DB from an SQL source file or URL. Will drop the DB first, if
-  it exists.
+  Generate a Django `models.py` class/model file from an HSD.
 
 - `pg-to-hsd`
 
@@ -259,6 +258,11 @@ When some values are specified elsewhere, parts can be left out. Only `type`,
 - `pg-to-dbic`
 
   Create a set of DBIx::Class models from a Postgres DB.
+
+- `sql-to-pg`
+
+  Load a Postgres DB from an SQL source file or URL. Will drop the DB first, if
+  it exists.
 
 == The `HITHER_*` Environment Variables
 

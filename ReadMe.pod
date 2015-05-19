@@ -338,10 +338,9 @@ C<address> and C<dbname> are required:
 
 =over
 
-=item C<sql-to-pg>
+=item C<hsd-to-django>
 
-Load a Postgres DB from an SQL source file or URL. Will drop the DB first, if
-it exists.
+Generate a Django C<models.py> class/model file from an HSD.
 
 =item C<pg-to-hsd>
 
@@ -360,6 +359,11 @@ DBIx::Class::Schema::Loader.
 =item C<pg-to-dbic>
 
 Create a set of DBIx::Class models from a Postgres DB.
+
+=item C<sql-to-pg>
+
+Load a Postgres DB from an SQL source file or URL. Will drop the DB first, if
+it exists.
 
 =back
 

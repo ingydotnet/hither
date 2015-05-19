@@ -2,6 +2,12 @@ set -e
 
 source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/bash+.bash"
 
+require-var() {
+  var="$1"
+  [ -n "$var" ] ||
+    die "Command requires '$var'"
+}
+
 read-input() {
   if [ -n "$HITHER_IN_URL" ]; then
     curl -Ls "$HITHER_IN_URL"
