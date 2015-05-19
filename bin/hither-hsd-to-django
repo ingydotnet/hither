@@ -1,0 +1,3 @@
+#!/usr/bin/env perl
+
+# --out=foo/bar/models.py --to=django

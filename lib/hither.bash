@@ -25,13 +25,9 @@ pg-db-exists() {
 }
 
 RUN() {
-  unset out err ret
-  eval "$(
-    run > >(out=$(cat); typeset -p out) \
-      2> >(err=$(cat); typeset -p err);
-    ret=$?; typeset -p ret
-  )"
-  stdout=$out
-  stderr=$err
-  retval=$ret
+  local tmp=$(mktemp)
+  retval=0
+  stdout=$(run 2>$tmp) || retval=$?
+  stderr=$(< $tmp)
+  rm "$tmp"
 }

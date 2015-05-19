@@ -1,0 +1,220 @@
+info:
+  type: postgres
+  name: booktown
+  hsid: 1e7f15ff4278b9102d0e202634df99d453885944
+table:
+  - name: alternate_stock
+    cols:
+      - name: isbn
+        type: text
+      - name: cost
+        type: numeric
+      - name: retail
+        type: numeric
+      - name: stock
+        type: integer
+  - name: authors
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: last_name
+        type: text
+      - name: first_name
+        type: text
+  - name: book_backup
+    cols:
+      - name: id
+        type: integer
+      - name: title
+        type: text
+      - name: author_id
+        type: integer
+      - name: subject_id
+        type: integer
+  - name: book_queue
+    cols:
+      - name: title
+        type: text
+        need: true
+      - name: author_id
+        type: integer
+      - name: subject_id
+        type: integer
+      - name: approved
+        type: boolean
+  - name: books
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: title
+        type: text
+        need: true
+      - name: author_id
+        type: integer
+      - name: subject_id
+        type: integer
+  - name: customers
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: last_name
+        type: text
+      - name: first_name
+        type: text
+  - name: daily_inventory
+    cols:
+      - name: isbn
+        type: text
+      - name: is_stocked
+        type: boolean
+  - name: distinguished_authors
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: last_name
+        type: text
+      - name: first_name
+        type: text
+      - name: award
+        type: text
+  - name: editions
+    cols:
+      - name: isbn
+        type: text
+        need: true
+      - name: book_id
+        type: integer
+      - name: edition
+        type: integer
+      - name: publisher_id
+        type: integer
+      - name: publication
+        type: date
+      - name: type
+        type: character
+  - name: employees
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: last_name
+        type: text
+        need: true
+      - name: first_name
+        type: text
+  - name: favorite_authors
+    cols:
+      - name: employee_id
+        type: integer
+      - name: authors_and_titles
+        type: array
+  - name: favorite_books
+    cols:
+      - name: employee_id
+        type: integer
+      - name: books
+        type: array
+  - name: money_example
+    cols:
+      - name: money_cash
+        type: money
+      - name: numeric_cash
+        type: numeric
+  - name: my_list
+    cols:
+      - name: todos
+        type: text
+  - name: numeric_values
+    cols:
+      - name: num
+        type: numeric
+  - name: publishers
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: name
+        type: text
+      - name: address
+        type: text
+  - name: recent_shipments
+    cols:
+      - name: num_shipped
+        type: bigint
+      - name: max
+        type: timestamp
+      - name: title
+        type: text
+  - name: schedules
+    cols:
+      - name: employee_id
+        type: integer
+        need: true
+      - name: schedule
+        type: text
+  - name: shipments
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: customer_id
+        type: integer
+      - name: isbn
+        type: text
+      - name: ship_date
+        type: timestamp
+  - name: states
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: name
+        type: text
+      - name: abbreviation
+        type: character
+  - name: stock
+    cols:
+      - name: isbn
+        type: text
+        need: true
+      - name: cost
+        type: numeric
+      - name: retail
+        type: numeric
+      - name: stock
+        type: integer
+  - name: stock_backup
+    cols:
+      - name: isbn
+        type: text
+      - name: cost
+        type: numeric
+      - name: retail
+        type: numeric
+      - name: stock
+        type: integer
+  - name: stock_view
+    cols:
+      - name: isbn
+        type: text
+      - name: retail
+        type: numeric
+      - name: stock
+        type: integer
+  - name: subjects
+    cols:
+      - name: id
+        type: integer
+        need: true
+      - name: subject
+        type: text
+      - name: location
+        type: text
+  - name: text_sorting
+    cols:
+      - name: letter
+        type: character
