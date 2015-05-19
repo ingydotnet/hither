@@ -69,13 +69,27 @@ C<bin/> directory to your C<PATH>:
     git clone git@github.com:ingydotnet/hither
     export PATH="$PWD/hither/bin:$PATH"
 
-However, Hither has a lot of dependencies:
+However, Hither currently has a lot of dependencies:
 
 Languages, and packages:
 
 =over
 
 =item * Bash
+
+=item * CoffeeScript
+
+=item * Node.js
+
+=over
+
+=item * crypto
+
+=item * js-yaml
+
+=item * pg-json-schema-export
+
+=back
 
 =item * Perl
 
@@ -87,6 +101,8 @@ Languages, and packages:
 
 =item * Template::Toolkit::Simple
 
+=item * YAML::XS
+
 =back
 
 =item * Python
@@ -94,20 +110,6 @@ Languages, and packages:
 =over
 
 =item * Django
-
-=back
-
-=item * CoffeeScript
-
-=item * Node.js
-
-=over
-
-=item * pg-json-schema-export
-
-=item * js-yaml
-
-=item * crypto
 
 =back
 
@@ -130,8 +132,8 @@ these things. :)
 
 =head2 Support and Functionality
 
-Hither tries to be a general tool, helping with many common operations on all
-the popular databases. The folling sections, list the current support level:
+Hither tries to be a general tool, helping with many common operations on many
+popular databases. The following sections, list the current support level:
 
 =head2 Supported Databases
 

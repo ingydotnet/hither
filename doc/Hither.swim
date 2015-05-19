@@ -61,22 +61,23 @@ Installing Hither is a simple as cloning its git repository and adding its
   git clone git@github.com:ingydotnet/hither
   export PATH="$PWD/hither/bin:$PATH"
 
-However, Hither has a lot of dependencies:
+However, Hither currently has a lot of dependencies:
 
 Languages, and packages:
 
 * Bash
+* CoffeeScript
+* Node.js
+  * crypto
+  * js-yaml
+  * pg-json-schema-export
 * Perl
   * DBIx::Class::Schema::Loader
   * SQL::Translator
   * Template::Toolkit::Simple
+  * YAML::XS
 * Python
   * Django
-* CoffeeScript
-* Node.js
-  * pg-json-schema-export
-  * js-yaml
-  * crypto
 
 Databases:
 
@@ -89,8 +90,8 @@ these things. :)
 
 == Support and Functionality
 
-Hither tries to be a general tool, helping with many common operations on all
-the popular databases. The folling sections, list the current support level:
+Hither tries to be a general tool, helping with many common operations on many
+popular databases. The following sections, list the current support level:
 
 == Supported Databases
 
