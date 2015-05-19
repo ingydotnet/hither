@@ -6,13 +6,21 @@ use Test::More
 source bin/hither
 
 test1() {
+  reset-test-vars
   IN=pg://bob:pw55@127.0.0.1/dataplace FROM=pg IN_TYPE=pg
   IN_USER=bob IN_PASSWORD=pw55 IN_HOST=127.0.0.1 IN_DBNAME=dataplace
   OUT=dataplace1.hsd TO=hsd
   run-test-vars cmd --in="$IN" --out="$OUT"
 }
 
-hither_vars=(
+test2() {
+  reset-test-vars
+  IN=dump.hsd FROM=hsd
+  OUT=path/to/django/models.py TO=django
+  run-test-vars cmd --in="$IN" --out="$OUT" --to=django
+}
+
+test_vars=(
   IN FROM IN_URL IN_TYPE
   IN_USER IN_PASSWORD
   IN_HOST IN_PORT IN_DBNAME
@@ -25,7 +33,7 @@ run-test-vars() {
   reset-env
   get-opts "$@"
   note "Testing 'hither $*'"
-  for var in ${hither_vars[@]}; do
+  for var in ${test_vars[@]}; do
     local hvar="HITHER_$var" label=
     local val="${!var}" hval="${!hvar}"
     # echo "$hvar=$hval"
@@ -44,13 +52,21 @@ run-test-vars() {
   done
 }
 
+reset-test-vars() {
+  for var in ${test_vars[@]}; do
+    unset $var
+  done
+}
+
 {
-  for i in {1..1}; do
-    "test$i"
+  i=1
+  while true; do
+    can "test$i" || break
+    "test$((i++))"
   done
 }
 
 
 done_testing
 
-# vim: set ft=sh:
+# vim: set ft=sh lisp:
