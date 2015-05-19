@@ -1,4 +1,5 @@
 set -e
+
 source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/bash+.bash"
 
 read-input() {

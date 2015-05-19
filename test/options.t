@@ -3,6 +3,7 @@
 source "$(dirname $0)/setup"
 use Test::More
 
+source lib/hither.bash
 source bin/hither
 
 test1() {

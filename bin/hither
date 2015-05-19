@@ -5,9 +5,9 @@
 # Copyright (c) 2015 Ingy döt Net
 
 set -e
+
 source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/bash+.bash"
 bash+:import :std can
-use Hither
 
 OPTIONS_SPEC="\
 hither [<action>] <options> <arguments>
