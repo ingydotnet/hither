@@ -56,10 +56,77 @@ Development projects (codebases) that use a database, need the database to be
 in a certain state. It may be the case that multiple dev teams are working on
 multiple branches that each need a different state. This is where Hither is of
 huge benefit. The codebase should identify (in code or config) the state it
-requires. If the Hither state of the DB is different than the state that the
-code wants, the codebase should refuse to connect to it, and give an error
+requires. If the Hither state of the database is different than the state that
+the code wants, the codebase should refuse to connect to it, and give an error
 message telling the user the 2 states (codebase and database). Then the user
 can simply use Hither to migrate.
+
+=head1 Installation
+
+Installing Hither is a simple as cloning its git repository and adding its
+C<bin/> directory to your C<PATH>:
+
+    git clone git@github.com:ingydotnet/hither
+    export PATH="$PWD/hither/bin:$PATH"
+
+However, Hither has a lot of dependencies:
+
+Languages, and packages:
+
+=over
+
+=item * Bash
+
+=item * Perl
+
+=over
+
+=item * DBIx::Class::Schema::Loader
+
+=item * SQL::Translator
+
+=item * Template::Toolkit::Simple
+
+=back
+
+=item * Python
+
+=over
+
+=item * Django
+
+=back
+
+=item * CoffeeScript
+
+=item * Node.js
+
+=over
+
+=item * pg-json-schema-export
+
+=item * js-yaml
+
+=item * crypto
+
+=back
+
+=back
+
+Databases:
+
+=over
+
+=item * PostgreSQL
+
+=item * MySQL
+
+=item * SQLite
+
+=back
+
+Since Hither is still in early development, it is left up to you to install
+these things. :)
 
 =head2 Support and Functionality
 
@@ -120,7 +187,7 @@ the popular databases. The folling sections, list the current support level:
 
 =item * Generate SQL migration files from HMD files
 
-=item * Apply a migration to a DB (and update the C<hither> table)
+=item * Apply a migration to a database (and update the C<hither> table)
 
 =back
 
@@ -133,8 +200,8 @@ hither activities. The usage is:
 
 =head2 C<hither> Options
 
-Hither is mostly concerned with taking a data source in a given format
-(input), to a data target in another format (output). The primary
+Hither is mostly concerned with transforming a data source in a given
+format (input), to a data target in another format (output). The primary
 options are thus:
 
 =over
@@ -154,7 +221,7 @@ See "Hither Connection URLs" below.
 
 Closely related are the options that say what format the data is in. Many
 times this is inferred from the file extension, or URL scheme but other times
-(like using STDIN/STDOUT) you need to specify the format explicitly with
+(such as using STDIN/STDOUT) you need to specify the format explicitly with
 these options:
 
 =over
@@ -373,6 +440,14 @@ The user name being used to access a database with user authentication.
 Environment variable for C<--verbose> option.
 
 =back
+
+=head1 Contribute
+
+Hither is an Open Source project. It is hosted on
+L<GitHub|https://github.com/ingydotnet/hither>. It has the IRC channel
+C<#hither> on irc.freenode.net.
+
+If you are interested in contributing, you know the drill. :)
 
 =head1 See Also
 

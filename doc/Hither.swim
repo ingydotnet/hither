@@ -48,10 +48,44 @@ Development projects (codebases) that use a database, need the database to be
 in a certain state. It may be the case that multiple dev teams are working on
 multiple branches that each need a different state. This is where Hither is of
 huge benefit. The codebase should identify (in code or config) the state it
-requires. If the Hither state of the DB is different than the state that the
-code wants, the codebase should refuse to connect to it, and give an error
+requires. If the Hither state of the database is different than the state that
+the code wants, the codebase should refuse to connect to it, and give an error
 message telling the user the 2 states (codebase and database). Then the user
 can simply use Hither to migrate.
+
+= Installation
+
+Installing Hither is a simple as cloning its git repository and adding its
+`bin/` directory to your `PATH`:
+
+  git clone git@github.com:ingydotnet/hither
+  export PATH="$PWD/hither/bin:$PATH"
+
+However, Hither has a lot of dependencies:
+
+Languages, and packages:
+
+* Bash
+* Perl
+  * DBIx::Class::Schema::Loader
+  * SQL::Translator
+  * Template::Toolkit::Simple
+* Python
+  * Django
+* CoffeeScript
+* Node.js
+  * pg-json-schema-export
+  * js-yaml
+  * crypto
+
+Databases:
+
+* PostgreSQL
+* MySQL
+* SQLite
+
+Since Hither is still in early development, it is left up to you to install
+these things. :)
 
 == Support and Functionality
 
@@ -85,7 +119,7 @@ the popular databases. The folling sections, list the current support level:
 * Extract database schema to HSD (Hither Schema Definition)
 * Generate migration (HMD) files from 2 HSDs
 * Generate SQL migration files from HMD files
-* Apply a migration to a DB (and update the `hither` table)
+* Apply a migration to a database (and update the `hither` table)
 
 = Command Line Usage
 
@@ -96,8 +130,9 @@ activities. The usage is:
 
 == `hither` Options
 
-Hither is mostly concerned with taking a data source in a given format (input),
-to a data target in another format (output). The primary options are thus:
+Hither is mostly concerned with transforming a data source in a given format
+(input), to a data target in another format (output). The primary options are
+thus:
 
 - `--input=` `-i`
 
@@ -111,8 +146,8 @@ Hither supports a database connection info URL for `--input` and `--output`.
 See "Hither Connection URLs" below.
 
 Closely related are the options that say what format the data is in. Many times
-this is inferred from the file extension, or URL scheme but other times (like
-using STDIN/STDOUT) you need to specify the format explicitly with these
+this is inferred from the file extension, or URL scheme but other times (such
+as using STDIN/STDOUT) you need to specify the format explicitly with these
 options:
 
 - `--from` `-f`
@@ -299,6 +334,14 @@ and `hither` will add them to the environment before executing the command.
 - `HITHER_VERBOSE`
 
   Environment variable for `--verbose` option.
+
+= Contribute
+
+Hither is an Open Source project. It is hosted on
+"GitHub"[https://github.com/ingydotnet/hither]. It has the IRC channel
+`#hither` on irc.freenode.net.
+
+If you are interested in contributing, you know the drill. :)
 
 = See Also
 
