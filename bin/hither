@@ -149,47 +149,34 @@ set-in() {
     set-var-from-ext "$val" IN
   elif [[ "$val" =~ ^([a-z]+):// ]]; then
     set-vars-from-conninfo-uri "$val" IN
-  elif [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
-    set-export DBNAME "${BASH_REMATCH[1]}"
-    export HITHER_FROM="${BASH_REMATCH[2]}"
+  elif [[ "$val" =~ ^.*\.(csv|hmd|hsd|sql)$ ]]; then
+    set-vars-from-filename "$val" "${BASH_REMATCH[1]}" IN FROM
   else
-    set-var-from-ext "$val" IN
+    error "Invalid value for '--input=$val'."
   fi
 }
 
 set-out() {
   local val="$1"
+  export HITHER_OUT="$val"
+  local in_out=OUT
   if [[ "$val" =~ ^https?: ]]; then
       error "Can't use URL for output"
-  elif [[ "$val" =~ ^(pg|my|lite): ]]; then
+  elif [[ "$val" =~ ^([a-z]+):// ]]; then
     set-vars-from-conninfo-uri "$val" OUT
-  elif [[ "$val" =~ ^(.*)\.(pg|my|lite)$ ]]; then
-    set-var-from-ext "$val" OUT
+  elif [[ "$val" =~ ^.*\.(csv|hmd|hsd|sql)$ ]]; then
+    set-vars-from-filename "$val" "${BASH_REMATCH[1]}" OUT TO
+  else
+    error "Invalid value for '--input=$val'."
   fi
 }
 
-set-var-from-ext() {
-  local path="$1"
-  local in_out="$2"
-  local to_from= dbtype=
-  [ "$in_out" == IN ] && to_from=HITHER_FROM || to_from=HITHER_TO
-  if [[ "$path" =~ ^(.*)\.(pg|postgres|postgresql|my|mysql|lite|sqlite3?)$ ]]; then
-    set-export DBNAME "${BASH_REMATCH[1]}"
-    dbtype="${BASH_REMATCH[2]}"
-    if [[ "$dbtype" =~ ^(pg|postgres|postgresql)$ ]]; then
-      dbtype=pg
-    elif [[ "$dbtype" =~ ^(my|mysql)$ ]]; then
-      dbtype=my
-    elif [[ "$dbtype" =~ ^(lite|sqlite)$ ]]; then
-      dbtype=lite
-    else
-      die "Unknown database type in URI: '$dbtype'"
-    fi
-  elif [[ "$path" =~ \.(hsd|hmd|hdf|sql)$ ]]; then
-    dbtype="${BASH_REMATCH[1]}"
-  fi
-  printf -v "$to_from" "$dbtype"
-  export "$to_from"
+set-vars-from-filename() {
+  local path="$1" ext="$2" in_out="$3" to_from="$4"
+  printf -v "HITHER_$to_from" "$ext"
+  export "HITHER_$to_from"
+  printf -v "HITHER_$in_out" "$path"
+  export "HITHER_$in_out"
 }
 
 # http://www.postgresql.org/docs/9.4/static/libpq-connect.html#AEN41094

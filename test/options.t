@@ -8,7 +8,8 @@ source bin/hither
 test1() {
   IN=pg://bob:pw55@127.0.0.1/dataplace FROM=pg IN_TYPE=pg
   IN_USER=bob IN_PASSWORD=pw55 IN_HOST=127.0.0.1 IN_DBNAME=dataplace
-  run-test-vars cmd --in="$IN"
+  OUT=dataplace1.hsd TO=hsd
+  run-test-vars cmd --in="$IN" --out="$OUT"
 }
 
 hither_vars=(
@@ -27,9 +28,10 @@ run-test-vars() {
   for var in ${hither_vars[@]}; do
     local hvar="HITHER_$var" label=
     local val="${!var}" hval="${!hvar}"
+    # echo "$hvar=$hval"
     if [ -n "$val" ]; then
       if [ -n "$hval" ]; then
-        printf -v label "%-14s => '%s'" "$hvar" "$val"
+        printf -v label "%-18s => '%s'" "$hvar" "$val"
         is "$hval" "$val" "$label"
       else
         fail "$hvar not set. Expected '$val'."
