@@ -2,7 +2,7 @@
 
 set -e
 
-source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/hither"
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
 
 [ -n "$HITHER_OUT_DBNAME" ] ||
   die "Command requires a database name"

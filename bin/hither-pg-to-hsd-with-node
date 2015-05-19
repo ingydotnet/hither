@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/hither"
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
 
 bin/util-pg-schema-to-json | write-output
 
