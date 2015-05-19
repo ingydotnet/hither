@@ -11,7 +11,7 @@ ok "`! pg-db-exists booktown`" "booktown db doesn't exist"
 
 run() {
   hither \
-      --in=test/devel/dataset/booktown.sql \
+      --in=test/dataset/pg/booktown.sql \
       --out=pg://$USER:h1th3r@localhost:5432/booktown
 }; RUN
 (exit $retval) || die "$stdout$stderr"
