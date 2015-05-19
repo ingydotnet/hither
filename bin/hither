@@ -164,10 +164,10 @@ set-out() {
       error "Can't use URL for output"
   elif [[ "$val" =~ ^([a-z]+):// ]]; then
     set-vars-from-conninfo-uri "$val" OUT
-  elif [[ "$val" =~ ^.*\.(csv|hmd|hsd|sql)$ ]]; then
+  elif [[ "$val" =~ ^.*\.(csv|hmd|hsd|sql|py)$ ]]; then
     set-vars-from-filename "$val" "${BASH_REMATCH[1]}" OUT TO
   else
-    error "Invalid value for '--input=$val'."
+    error "Invalid value for '--output=$val'."
   fi
 }
 
