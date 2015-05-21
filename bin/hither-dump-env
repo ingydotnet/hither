@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+env | grep '^HITHER_'
+
+# vim: set ft=sh:
