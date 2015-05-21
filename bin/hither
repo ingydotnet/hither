@@ -56,7 +56,7 @@ main() {
   if $(type "$command" &>/dev/null); then
     "$command" "${action_arguments[@]}"
   else
-    error "Unsupported hither action: '$command'\n"
+    error "Unsupported hither action: '$command'"
   fi
 }
 
