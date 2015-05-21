@@ -8,6 +8,11 @@ require-var() {
     die "Command requires '$var'"
 }
 
+set-env-vars-pg() {
+  [ -z "$HITHER_IN_DBNAME" ] ||
+    export PGDATABASE="$HITHER_IN_DBNAME"
+}
+
 read-input() {
   if [ -n "$HITHER_IN_URL" ]; then
     curl -Ls "$HITHER_IN_URL"
