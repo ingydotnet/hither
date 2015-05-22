@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
+
+read-input | "$HITHER_LIB"/hither-util-hsd-to-django # | write-output
+
+# vim: set ft=sh:

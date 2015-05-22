@@ -46,15 +46,15 @@ main() {
     if can "action:$HITHER_ACTION"; then
       "action:$HITHER_ACTION" "${action_arguments[@]}"
       return
-    elif $(type "hither-$HITHER_ACTION" &>/dev/null); then
-      "hither-$HITHER_ACTION" "${action_arguments[@]}"
+    elif $(type "hither-cmd-$HITHER_ACTION" &>/dev/null); then
+      "hither-cmd-$HITHER_ACTION" "${action_arguments[@]}"
       return
     fi
   fi
 
   create-action-command
-  if $(type "$command" &>/dev/null); then
-    "$command" "${action_arguments[@]}"
+  if $(type "$HITHER_LIB/$command" &>/dev/null); then
+    "$HITHER_LIB/$command" "${action_arguments[@]}"
   else
     error "Unsupported hither action: '$command'"
   fi
@@ -278,7 +278,7 @@ assert-command() {
 }
 
 create-action-command() {
-  command="hither-"
+  command="hither-cmd-"
   if [ -n "$HITHER_ACTION" ]; then
     command+="$HITHER_ACTION-"
   fi
@@ -287,6 +287,10 @@ create-action-command() {
     command+="with-$HITHER_WITH"
   fi
 }
+
+export HITHER_BIN="$(cd -P `dirname $BASH_SOURCE` && pwd -P)"
+export HITHER_LIB="$(cd -P `dirname $BASH_SOURCE`/../lib && pwd -P)"
+export PATH="$HITHER_LIB:$PATH"
 
 [ "${BASH_SOURCE[0]}" != "$0" ] || main "$@"
 
