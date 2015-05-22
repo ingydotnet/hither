@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
+
+set-env-vars-pg
+
+[ -n "$HITHER_OUT_DBNAME" ] ||
+  die "Command requires a database name"
+[ -n "$HITHER_OUT_TABLE" ] ||
+  die "Command requires a database name"
+
+if `pg-db-exists "$HITHER_OUT_DBNAME"`; then
+  psql -c "drop database $HITHER_OUT_DBNAME" # &>/dev/null || true
+fi
+
+psql -c "create database $HITHER_OUT_DBNAME" # &>/dev/null || true
+exit 4
+psql -c "create table $HITHER_OUT_TABLE" $HITHER_OUT_DBNAME &>/dev/null || true
+
+read-input |
+  psql -c "COPY $HITHER_OUT_TABLE FROM STDIN delimiter '|' csv;" \
+    $HITHER_OUT_DBNAME
+
+# vim: set lisp ft=sh:
