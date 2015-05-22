@@ -213,8 +213,21 @@ set-vars-from-conninfo-uri() {
   if [[ "$url" =~ ([^/]+)/(.*) ]]; then
     url="${url%%/*}"
     local path="${BASH_REMATCH[2]}"
-    if [[ "$path" =~ \? ]]; then
-      error "Hither URL doesn't support '?options' yet."
+    if [[ "$path" =~ \?(.*) ]]; then
+      path="${path%%\?*}"
+      options="${BASH_REMATCH[1]}"
+      IFS=';' read -ra opts <<< "$options"
+      for opt in "${opts[@]}"; do
+        [[ "$opt" =~ (.+)=(.+) ]] ||
+          die "Invalid option '$opt'"
+        key="${BASH_REMATCH[1]}"
+        val="${BASH_REMATCH[2]}"
+        if [ "$key" == table ]; then
+          set-export TABLE "$val"
+        else
+          error "Uknown option '$key'"
+        fi
+      done
     fi
     set-export DBNAME "$path"
   fi

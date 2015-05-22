@@ -8,26 +8,36 @@ source bin/hither
 
 test1() {
   reset-test-vars
-  IN=pg://bob:pw55@127.0.0.1/dataplace FROM=pg IN_TYPE=pg
-  IN_USER=bob IN_PASSWORD=pw55 IN_HOST=127.0.0.1 IN_DBNAME=dataplace
+
+  IN='pg://bob:pw55@127.0.0.1/dataplace?table=stuff' FROM=pg IN_TYPE=pg
+  IN_USER=bob IN_PASSWORD=pw55 IN_HOST=127.0.0.1
+  IN_DBNAME=dataplace IN_TABLE=stuff
+
   OUT=dataplace1.hsd TO=hsd
+
   run-test-vars cmd --in="$IN" --out="$OUT"
 }
 
 test2() {
   reset-test-vars
+
   IN=dump.hsd FROM=hsd
+
   OUT=path/to/django/models.py TO=django
+
   run-test-vars cmd --in="$IN" --out="$OUT" --to=django
 }
 
 test_vars=(
   IN FROM IN_URL IN_TYPE
   IN_USER IN_PASSWORD
-  IN_HOST IN_PORT IN_DBNAME
+  IN_HOST IN_PORT
+  IN_DBNAME IN_TABLE
+
   OUT TO OUT_URL OUT_TYPE
   OUT_USER OUT_PASSWORD
-  OUT_HOST OUT_PORT OUT_DBNAME
+  OUT_HOST OUT_PORT
+  OUT_DBNAME OUT_TABLE
 )
 
 run-test-vars() {
