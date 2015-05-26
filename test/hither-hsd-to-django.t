@@ -17,4 +17,4 @@ ok "$retval" "Make Django model from HSD was successful"
 
 done_testing
 
-# vim: set lisp sw=2:
+# vim: set ft=sh lisp sw=2:

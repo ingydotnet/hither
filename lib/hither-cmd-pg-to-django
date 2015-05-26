@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/hither.bash"
+
+for v in DBNAME HOST PORT USER PASSWORD; do
+  hv=HITHER_$v iv=HITHER_IN_$v
+  printf -v $hv ${!iv}
+  export $hv
+done
+
+if [ -n "$HITHER_DJANGO_ROOT" ]; then
+  hither_django_root=$HITHER_DJANGO_ROOT
+  temp_dir=false
+else
+  hither_django_root=$(mktemp -d)
+  temp_dir=true
+fi
+
+hither-util-django-setup $hither_django_root
+
+(
+  cd $hither_django_root
+  source ./bin/activate
+  cd hither
+  python manage.py inspectdb
+)
+
+if $temp_dir; then
+  rm -fr $hither_django_root
+fi
+
+# vim: set ft=sh:

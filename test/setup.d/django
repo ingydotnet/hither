@@ -7,30 +7,33 @@ django_project="${django_repo//-/_}"
 django_app=data_viewer
 django_dir="$virtualenv_dir/$django_project"
 
-if [ "$1" == -R ]; then
+if [ "$1" == --RESET ]; then
+  echo "# --RESET found: 'rm -fr $virtualenv_dir'"
   rm -fr "$virtualenv_dir"
 fi
 
 if [ ! -d "$virtualenv_dir" ]; then
-  (
-    virtualenv "$virtualenv_dir" &>/dev/null
-    git clone \
-      "git@github.com:ingydotnet/$django_repo" \
-      "$django_dir"
-  ) &>/dev/null
+  echo "# Making new virtualenv '$virtualenv_dir'"
+  virtualenv "$virtualenv_dir" &>/dev/null
+  echo "# Making new django project '$django_dir'"
+  git clone \
+    "git@github.com:ingydotnet/$django_repo" \
+    "$django_dir" \
+    &>/dev/null
 fi
 
 # Set up python env:
+source $virtualenv_dir/bin/activate
 (
   cd "$virtualenv_dir"
 
-  source bin/activate
   if ! `which django-admin &>/dev/null`; then
-    pip install django
-    pip install pyyaml
+    echo "# Installing django"
+    pip install django &>/dev/null
+    echo "# Installing pyyaml"
+    pip install pyyaml &>/dev/null
   fi
-) &>/dev/null
-source $virtualenv_dir/bin/activate
+)
 
 cd "$django_dir"
 git clean -dxf &>/dev/null
