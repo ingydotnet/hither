@@ -31,4 +31,33 @@ assert-booktown-db() {
   fi
 }
 
+FAIL=true
+MERGE=false
+SAY=false
+CMD=run
+RUN() {
+  [ $# -gt 0 ] && local cmd=("$@") || local cmd=($CMD)
+  if $SAY; then
+    echo ">>> $cmd"
+  fi
+  retval=0
+  if $MERGE; then
+    stdout=$("${cmd[@]}" 2>&1) || retval=$?
+    stderr=
+  else
+    local tmp=$(mktemp)
+    stdout=$("${cmd[@]}" 2>$tmp) || retval=$?
+    stderr=$(< $tmp)
+    rm "$tmp"
+  fi
+  if [ $retval -ne 0 ]; then
+    if $FAIL; then
+      die "Command failed:"$'\n'"$stdout$stderr"
+    else
+      echo "$stdout$stderr" >&2
+      return $retval
+    fi
+  fi
+}
+
 # vim: set sw=2:

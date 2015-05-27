@@ -4,6 +4,9 @@ source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
 
 set-env-vars-pg
 
-pg_dump -s | write-output
+(
+  set -o pipefail
+  pg_dump -s | write-output
+)
 
 # vim: set ft=sh:

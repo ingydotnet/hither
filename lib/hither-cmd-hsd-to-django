@@ -2,6 +2,9 @@
 
 source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
 
-read-input | "$HITHER_LIB"/hither-util-hsd-to-django # | write-output
+(
+  set -o pipefail
+  read-input | "$HITHER_LIB"/hither-util-hsd-to-django | write-output
+)
 
 # vim: set ft=sh:

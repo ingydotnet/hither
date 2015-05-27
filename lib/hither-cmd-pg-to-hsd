@@ -1,8 +1,1 @@
-#!/usr/bin/env bash
-
-source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
-
-"$HITHER_LIB"/hither-util-pg-schema-to-json | write-output
-
-# vim: set ft=sh:
-
+hither-cmd-pg-to-hsd-with-node

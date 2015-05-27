@@ -284,7 +284,7 @@ create-action-command() {
   fi
   command+="$HITHER_FROM-to-$HITHER_TO"
   if [ -n "$HITHER_WITH" ]; then
-    command+="with-$HITHER_WITH"
+    command+="-with-$HITHER_WITH"
   fi
 }
 
