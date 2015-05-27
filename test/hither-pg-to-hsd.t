@@ -5,12 +5,9 @@ use Test::More
 
 assert-booktown-db
 
-run() {
-  hither --in=pg://$USER:h1th3r@localhost:5432/booktown --to=hsd
-}; RUN
+RUN hither --in=pg://$USER:h1th3r@localhost:5432/booktown --to=hsd
 
 ok "$retval" "Make HSD from pg was successful"
-(exit $retval) || diag "$stdout$stderr"
 
 like "$stdout" "name: booktown" "HSD has table name"
 

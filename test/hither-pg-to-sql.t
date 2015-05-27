@@ -5,12 +5,9 @@ use Test::More
 
 assert-booktown-db
 
-run() {
-  hither --in=pg://localhost/booktown --to=sql
-}; RUN
+RUN hither --in=pg://localhost/booktown --to=sql
 
 ok "$retval" "Make Django model from HSD was successful"
-(exit $retval) || diag "$stdout$stderr"
 
 like "$stdout" "PostgreSQL database dump" "Database dump worked"
 unlike "$stdout" "COPY" "Dump is schema only"

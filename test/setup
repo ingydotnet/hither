@@ -22,12 +22,9 @@ reset-env() {
 
 assert-booktown-db() {
   if `! pg-db-exists booktown`; then
-    run() {
-      hither \
-          --in=test/dataset/pg/booktown.sql \
-          --out=pg://hither:h1th3r@localhost:5432/booktown
-    }; RUN
-    (exit $retval) || diag "$stdout$stderr"
+    RUN hither \
+      --in=test/dataset/pg/booktown.sql \
+      --out=pg://hither:h1th3r@localhost:5432/booktown
   fi
   if `! pg-db-exists booktown`; then
     die "Can't create booktown db"

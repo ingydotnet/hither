@@ -9,20 +9,15 @@ fi
 
 ok "`! pg-db-exists booktown`" "booktown db doesn't exist"
 
-run() {
-  hither \
-      --in=test/dataset/pg/booktown.sql \
-      --out=pg://$USER:h1th3r@localhost:5432/booktown
-}; RUN
-(exit $retval) || die "$stdout$stderr"
+RUN hither \
+  --in=test/dataset/pg/booktown.sql \
+  --out=pg://$USER:h1th3r@localhost:5432/booktown
 
 ok "$retval" "'hither' return code is 0"
 
 ok "`pg-db-exists booktown`" "booktown db exists"
 
-run() {
-  psql -d booktown -c 'select * from books'
-}; RUN
+RUN psql -d booktown -c 'select * from books'
 
 like "$stdout" "(15 rows)" "booktown/books table has 15 rows"
 

@@ -9,20 +9,15 @@ fi
 
 ok "`! pg-db-exists csv`" "csv db doesn't exist"
 
-# run() {
-#   hither \
-#       --in=test/dataset/csv/Seattle-Traffic-Cams.csv \
-#       --out=pg://$USER:h1th3r@localhost:5432/csv?table=seattle_traffic_cams
-# }; RUN
-# (exit $retval) || die "$stdout$stderr"
+# RUN hither \
+#   --in=test/dataset/csv/Seattle-Traffic-Cams.csv \
+#   --out=pg://$USER:h1th3r@localhost:5432/csv?table=seattle_traffic_cams
 # 
 # ok "$retval" "'hither' return code is 0"
 # 
 # ok "`pg-db-exists csv`" "csv db exists"
 # 
-# run() {
-#   psql -d csv -c 'select * from seattle_traffic_cams'
-# }; RUN
+# RUN psql -d csv -c 'select * from seattle_traffic_cams'
 # 
 # like "$stdout" "(15 rows)" "csv/seattle_traffic_cams table has 15 rows"
 
