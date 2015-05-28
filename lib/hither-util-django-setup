@@ -7,7 +7,7 @@ main() {
   local django_project=hither
   local django_root=$virtualenv/$django_project/$django_project
 
-  if [ ! -e $virtualenv ]; then
+  if [ ! -f "$virtualenv/bin/python" ]; then
     virtualenv $virtualenv &>/dev/null
   fi
 

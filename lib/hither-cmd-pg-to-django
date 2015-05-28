@@ -12,7 +12,7 @@ if [ -n "$HITHER_DJANGO_ROOT" ]; then
   hither_django_root=$HITHER_DJANGO_ROOT
   temp_dir=false
 else
-  hither_django_root=$(mktemp -d)
+  hither_django_root=$(mktemp -d -t hither-django-XXXXXXXX)
   temp_dir=true
 fi
 
@@ -26,7 +26,13 @@ hither-util-django-setup $hither_django_root
 )
 
 if $temp_dir; then
-  rm -fr $hither_django_root
+  cat <<... >&2
+This work was done in a Python virtualenv that needed to be set up and
+configured. To reuse this environment, enter this line:
+
+  export HITHER_DJANGO_ROOT="$hither_django_root"
+
+...
 fi
 
 # vim: set ft=sh:
