@@ -1,0 +1,327 @@
+package TestSchema::Result::AlternateStock;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("alternate_stock");
+__PACKAGE__->add_columns(
+  "isbn",
+  { data_type => "text", is_nullable => 1 },
+  "cost",
+  { data_type => "numeric", is_nullable => 1, size => [5, 2] },
+  "retail",
+  { data_type => "numeric", is_nullable => 1, size => [5, 2] },
+  "stock",
+  { data_type => "integer", is_nullable => 1 },
+);
+
+package TestSchema::Result::Author;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("authors");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 0 },
+  "last_name",
+  { data_type => "text", is_nullable => 1 },
+  "first_name",
+  { data_type => "text", is_nullable => 1 },
+);
+__PACKAGE__->set_primary_key("id");
+
+package TestSchema::Result::BookBackup;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("book_backup");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 1 },
+  "title",
+  { data_type => "text", is_nullable => 1 },
+  "author_id",
+  { data_type => "integer", is_nullable => 1 },
+  "subject_id",
+  { data_type => "integer", is_nullable => 1 },
+);
+
+package TestSchema::Result::Book;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("books");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 0 },
+  "title",
+  { data_type => "text", is_nullable => 0 },
+  "author_id",
+  { data_type => "integer", is_nullable => 1 },
+  "subject_id",
+  { data_type => "integer", is_nullable => 1 },
+);
+__PACKAGE__->set_primary_key("id");
+
+package TestSchema::Result::BookQueue;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("book_queue");
+__PACKAGE__->add_columns(
+  "title",
+  { data_type => "text", is_nullable => 0 },
+  "author_id",
+  { data_type => "integer", is_nullable => 1 },
+  "subject_id",
+  { data_type => "integer", is_nullable => 1 },
+  "approved",
+  { data_type => "boolean", is_nullable => 1 },
+);
+
+package TestSchema::Result::Customer;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("customers");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 0 },
+  "last_name",
+  { data_type => "text", is_nullable => 1 },
+  "first_name",
+  { data_type => "text", is_nullable => 1 },
+);
+__PACKAGE__->set_primary_key("id");
+
+package TestSchema::Result::DailyInventory;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("daily_inventory");
+__PACKAGE__->add_columns(
+  "isbn",
+  { data_type => "text", is_nullable => 1 },
+  "is_stocked",
+  { data_type => "boolean", is_nullable => 1 },
+);
+
+package TestSchema::Result::DistinguishedAuthor;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("distinguished_authors");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 0 },
+  "last_name",
+  { data_type => "text", is_nullable => 1 },
+  "first_name",
+  { data_type => "text", is_nullable => 1 },
+  "award",
+  { data_type => "text", is_nullable => 1 },
+);
+
+package TestSchema::Result::Edition;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("editions");
+__PACKAGE__->add_columns(
+  "isbn",
+  { data_type => "text", is_nullable => 0 },
+  "book_id",
+  { data_type => "integer", is_nullable => 1 },
+  "edition",
+  { data_type => "integer", is_nullable => 1 },
+  "publisher_id",
+  { data_type => "integer", is_nullable => 1 },
+  "publication",
+  { data_type => "date", is_nullable => 1 },
+  "type",
+  { data_type => "char", is_nullable => 1, size => 1 },
+);
+__PACKAGE__->set_primary_key("isbn");
+
+package TestSchema::Result::Employee;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("employees");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 0 },
+  "last_name",
+  { data_type => "text", is_nullable => 0 },
+  "first_name",
+  { data_type => "text", is_nullable => 1 },
+);
+__PACKAGE__->set_primary_key("id");
+__PACKAGE__->might_have(
+  "schedule",
+  "TestSchema::Result::Schedule",
+  { "foreign.employee_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+package TestSchema::Result::FavoriteAuthor;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("favorite_authors");
+__PACKAGE__->add_columns(
+  "employee_id",
+  { data_type => "integer", is_nullable => 1 },
+  "authors_and_titles",
+  { data_type => "text[]", is_nullable => 1 },
+);
+
+package TestSchema::Result::FavoriteBook;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("favorite_books");
+__PACKAGE__->add_columns(
+  "employee_id",
+  { data_type => "integer", is_nullable => 1 },
+  "books",
+  { data_type => "text[]", is_nullable => 1 },
+);
+
+package TestSchema::Result::MoneyExample;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("money_example");
+__PACKAGE__->add_columns(
+  "money_cash",
+  { data_type => "money", is_nullable => 1 },
+  "numeric_cash",
+  { data_type => "numeric", is_nullable => 1, size => [6, 2] },
+);
+
+package TestSchema::Result::MyList;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("my_list");
+__PACKAGE__->add_columns("todos", { data_type => "text", is_nullable => 1 });
+
+package TestSchema::Result::NumericValue;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("numeric_values");
+__PACKAGE__->add_columns(
+  "num",
+  { data_type => "numeric", is_nullable => 1, size => [30, 6] },
+);
+
+package TestSchema::Result::Publisher;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("publishers");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 0 },
+  "name",
+  { data_type => "text", is_nullable => 1 },
+  "address",
+  { data_type => "text", is_nullable => 1 },
+);
+__PACKAGE__->set_primary_key("id");
+__PACKAGE__->add_unique_constraint("unique_publisher_idx", ["name"]);
+
+package TestSchema::Result::RecentShipment;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table_class("DBIx::Class::ResultSource::View");
+__PACKAGE__->table("recent_shipments");
+__PACKAGE__->add_columns(
+  "num_shipped",
+  { data_type => "bigint", is_nullable => 1 },
+  "max",
+  { data_type => "timestamp with time zone", is_nullable => 1 },
+  "title",
+  { data_type => "text", is_nullable => 1 },
+);
+
+package TestSchema::Result::Schedule;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("schedules");
+__PACKAGE__->add_columns(
+  "employee_id",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "schedule",
+  { data_type => "text", is_nullable => 1 },
+);
+__PACKAGE__->set_primary_key("employee_id");
+__PACKAGE__->belongs_to(
+  "employee",
+  "TestSchema::Result::Employee",
+  { id => "employee_id" },
+  { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
+
+package TestSchema::Result::Shipment;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("shipments");
+__PACKAGE__->add_columns(
+  "id",
+  {
+    data_type     => "integer",
+    default_value => \"nextval(('\"shipments_ship_id_seq\"'::text)::regclass)",
+    is_nullable   => 0,
+  },
+  "customer_id",
+  { data_type => "integer", is_nullable => 1 },
+  "isbn",
+  { data_type => "text", is_nullable => 1 },
+  "ship_date",
+  { data_type => "timestamp with time zone", is_nullable => 1 },
+);
+__PACKAGE__->add_unique_constraint("shipments_ship_id_key", ["id"]);
+
+package TestSchema::Result::State;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("states");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 0 },
+  "name",
+  { data_type => "text", is_nullable => 1 },
+  "abbreviation",
+  { data_type => "char", is_nullable => 1, size => 2 },
+);
+__PACKAGE__->set_primary_key("id");
+
+package TestSchema::Result::StockBackup;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("stock_backup");
+__PACKAGE__->add_columns(
+  "isbn",
+  { data_type => "text", is_nullable => 1 },
+  "cost",
+  { data_type => "numeric", is_nullable => 1, size => [5, 2] },
+  "retail",
+  { data_type => "numeric", is_nullable => 1, size => [5, 2] },
+  "stock",
+  { data_type => "integer", is_nullable => 1 },
+);
+
+package TestSchema::Result::Stock;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("stock");
+__PACKAGE__->add_columns(
+  "isbn",
+  { data_type => "text", is_nullable => 0 },
+  "cost",
+  { data_type => "numeric", is_nullable => 1, size => [5, 2] },
+  "retail",
+  { data_type => "numeric", is_nullable => 1, size => [5, 2] },
+  "stock",
+  { data_type => "integer", is_nullable => 1 },
+);
+__PACKAGE__->set_primary_key("isbn");
+
+package TestSchema::Result::StockView;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table_class("DBIx::Class::ResultSource::View");
+__PACKAGE__->table("stock_view");
+__PACKAGE__->add_columns(
+  "isbn",
+  { data_type => "text", is_nullable => 1 },
+  "retail",
+  { data_type => "numeric", is_nullable => 1, size => [5, 2] },
+  "stock",
+  { data_type => "integer", is_nullable => 1 },
+);
+
+package TestSchema::Result::Subject;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("subjects");
+__PACKAGE__->add_columns(
+  "id",
+  { data_type => "integer", is_nullable => 0 },
+  "subject",
+  { data_type => "text", is_nullable => 1 },
+  "location",
+  { data_type => "text", is_nullable => 1 },
+);
+__PACKAGE__->set_primary_key("id");
+
+package TestSchema::Result::TextSorting;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table("text_sorting");
+__PACKAGE__->add_columns(
+  "letter",
+  { data_type => "char", is_nullable => 1, size => 1 },
+);
+
