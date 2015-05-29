@@ -2,9 +2,10 @@
 
 source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
 
+export HITHER_DJANGO_ADMIN_COMMAND=hitherpgtohsd
 (
   set -o pipefail
-  "$HITHER_LIB"/hither-util-pg-to-hsd-with-node | write-output
+  "$HITHER_LIB"/hither-cmd-pg-to-django | write-output
 )
 
 # vim: set ft=sh:

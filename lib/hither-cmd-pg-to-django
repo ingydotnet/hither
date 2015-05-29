@@ -17,12 +17,13 @@ else
 fi
 
 hither-util-django-setup $hither_django_root
+cp $HITHER_LIB/hither*.py $HITHER_DJANGO_ROOT/lib/python2.7/site-packages/django/core/management/commands/
 
 (
   cd $hither_django_root
   source ./bin/activate
   cd hither
-  python manage.py inspectdb
+  python manage.py ${HITHER_DJANGO_ADMIN_COMMAND:-inspectdb}
 )
 
 if $temp_dir; then

@@ -5,6 +5,10 @@ use Test::More
 
 assert-booktown-db
 
+export HITHER_DJANGO_ROOT="$(
+  ls -1drt /tmp/hither-django-* 2>/dev/null | head -n1
+)"
+
 RUN hither \
   --in=pg://$USER:h1th3r@localhost:5432/booktown \
   --to=hsd \
