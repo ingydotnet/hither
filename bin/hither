@@ -39,7 +39,7 @@ main() {
 
   init-env
   get-opts "$@"
-  set-vars
+  assert-vars
   check-profile
 
   if [ -n "$HITHER_ACTION" ]; then
@@ -148,8 +148,7 @@ set-in() {
   local in_out= from_to=
   $in1 && in_out=IN2 || in_out=IN
   $in1 && from_to=FROM2 || from_to=FROM
-  printf -v "HITHER_$in_out" "$val"
-  export "HITHER_$in_out"
+  set-var "$in_out" "$val"
   if [[ "$val" =~ ^https?: ]]; then
     set-vars-from-url "$val"
   elif [[ "$val" =~ ^([a-z]+):// ]]; then
@@ -178,21 +177,16 @@ set-out() {
 
 set-vars-from-filename() {
   local path="$1" ext="$2"
-  printf -v "HITHER_$from_to" "$ext"
-  export "HITHER_$from_to"
-  printf -v "HITHER_$in_out" "$path"
-  export "HITHER_$in_out"
+  set-var "$from_to" "$ext"
+  set-var "$in_out" "$path"
 }
 
 set-vars-from-url() {
   local url="$1"
-  printf -v "HITHER_$in_out" "$url"
-  export "HITHER_$in_out"
-  printf -v "HITHER_${in_out}_URL" "$url"
-  export "HITHER_${in_out}_URL"
+  set-var "$in_out" "$url"
+  set-var "${in_out}_URL" "$url"
   if [[ "$url" =~ ^.*\.(csv|hmd|hsd|sql)$ ]]; then
-    printf -v "HITHER_$from_to" "${BASH_REMATCH[1]}"
-    export "HITHER_$from_to"
+    set-var "$from_to" "${BASH_REMATCH[1]}"
   fi
 }
 
@@ -209,19 +203,18 @@ set-vars-from-conninfo-uri() {
   else
     die "Unknown database type in URI: '$dbtype'"
   fi
-  printf -v "HITHER_$from_to" "$dbtype"
-  export "HITHER_$from_to"
-  set-export TYPE "$dbtype"
+  set-var "$from_to" "$dbtype"
+  set-in-out-var TYPE "$dbtype"
   url="${url/${BASH_REMATCH[1]}:/}"
   url="${url#//}"
   if [[ "$url" =~ (.*?)@ ]]; then
     url="${url#*@}"
     userpass="${BASH_REMATCH[1]}"
     if [[ "$userpass" =~ ^(.*):(.*)$ ]]; then
-      set-export USER "${BASH_REMATCH[1]}"
-      set-export PASSWORD "${BASH_REMATCH[2]}"
+      set-in-out-var USER "${BASH_REMATCH[1]}"
+      set-in-out-var PASSWORD "${BASH_REMATCH[2]}"
     else
-      set-export USER "$userpass"
+      set-in-out-var USER "$userpass"
     fi
   fi
   if [[ "$url" =~ ([^/]+)/(.*) ]]; then
@@ -237,29 +230,33 @@ set-vars-from-conninfo-uri() {
         key="${BASH_REMATCH[1]}"
         val="${BASH_REMATCH[2]}"
         if [ "$key" == table ]; then
-          set-export TABLE "$val"
+          set-in-out-var TABLE "$val"
         else
           error "Uknown option '$key'"
         fi
       done
     fi
-    set-export DBNAME "$path"
+    set-in-out-var DBNAME "$path"
   fi
   if [[ "$url" =~ ^(.*):([0-9]{1,5})$ ]]; then
-    set-export HOST "${BASH_REMATCH[1]}"
-    set-export PORT "${BASH_REMATCH[2]}"
+    set-in-out-var HOST "${BASH_REMATCH[1]}"
+    set-in-out-var PORT "${BASH_REMATCH[2]}"
   else
-    set-export HOST "$url"
+    set-in-out-var HOST "$url"
   fi
 }
 
-set-export() {
-  local var="HITHER_${in_out}_$1" val="$2"
+set-var() {
+  local var="HITHER_$1" val="$2"
   printf -v "$var" "$val"
   export "$var"
 }
 
-set-vars() {
+set-in-out-var() {
+  set-var "${in_out}_$1" "$2"
+}
+
+assert-vars() {
   local want='hsd|hmd|pg|my|lite|hsd|sql|csv|dbic|django'
   [ -n "$HITHER_FROM" ] ||
     error "Can't determine FROM value. Try using '--from=…'."
