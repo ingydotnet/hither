@@ -84,11 +84,13 @@ get-opts() {
     echo exit $?
   )"
 
+  local in1=false
   while [ $# -gt 0 ]; do
     local option="$1"; shift
     case "$option" in
       -i)
         set-in "$1"
+        in1=true
         shift
         ;;
       -o)
@@ -143,15 +145,17 @@ get-opts() {
 
 set-in() {
   local val="$1"
-  export HITHER_IN="$val"
-  local in_out=IN
+  local in_out= from_to=
+  $in1 && in_out=IN2 || in_out=IN
+  $in1 && from_to=FROM2 || from_to=FROM
+  printf -v "HITHER_$in_out" "$val"
+  export "HITHER_$in_out"
   if [[ "$val" =~ ^https?: ]]; then
-    set-export URL "$val"
-    set-var-from-ext "$val" IN
+    set-vars-from-url "$val"
   elif [[ "$val" =~ ^([a-z]+):// ]]; then
-    set-vars-from-conninfo-uri "$val" IN
+    set-vars-from-conninfo-uri "$val"
   elif [[ "$val" =~ ^.*\.(csv|hmd|hsd|sql)$ ]]; then
-    set-vars-from-filename "$val" "${BASH_REMATCH[1]}" IN FROM
+    set-vars-from-filename "$val" "${BASH_REMATCH[1]}"
   else
     error "Invalid value for '--input=$val'."
   fi
@@ -160,33 +164,43 @@ set-in() {
 set-out() {
   local val="$1"
   export HITHER_OUT="$val"
-  local in_out=OUT
+  local in_out=OUT from_to=TO
   if [[ "$val" =~ ^https?: ]]; then
-      error "Can't use URL for output"
+    error "Can't use URL for output"
   elif [[ "$val" =~ ^([a-z]+):// ]]; then
-    set-vars-from-conninfo-uri "$val" OUT
+    set-vars-from-conninfo-uri "$val"
   elif [[ "$val" =~ ^.*\.(csv|hmd|hsd|sql|py)$ ]]; then
-    set-vars-from-filename "$val" "${BASH_REMATCH[1]}" OUT TO
+    set-vars-from-filename "$val" "${BASH_REMATCH[1]}"
   else
     error "Invalid value for '--output=$val'."
   fi
 }
 
 set-vars-from-filename() {
-  local path="$1" ext="$2" in_out="$3" to_from="$4"
-  printf -v "HITHER_$to_from" "$ext"
-  export "HITHER_$to_from"
+  local path="$1" ext="$2"
+  printf -v "HITHER_$from_to" "$ext"
+  export "HITHER_$from_to"
   printf -v "HITHER_$in_out" "$path"
   export "HITHER_$in_out"
+}
+
+set-vars-from-url() {
+  local url="$1"
+  printf -v "HITHER_$in_out" "$url"
+  export "HITHER_$in_out"
+  printf -v "HITHER_${in_out}_URL" "$url"
+  export "HITHER_${in_out}_URL"
+  if [[ "$url" =~ ^.*\.(csv|hmd|hsd|sql)$ ]]; then
+    printf -v "HITHER_$from_to" "${BASH_REMATCH[1]}"
+    export "HITHER_$from_to"
+  fi
 }
 
 # http://www.postgresql.org/docs/9.4/static/libpq-connect.html#AEN41094
 # postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]
 set-vars-from-conninfo-uri() {
   local url="$1"
-  local in_out="$2"
-  local to_from= dbtype=
-  [ "$in_out" == IN ] && to_from=HITHER_FROM || to_from=HITHER_TO
+  local dbtype=
   [[ "$val" =~ ^([a-z]+):// ]] || die
   dbtype="${BASH_REMATCH[1]}"
   if [[ "$dbtype" =~ ^(pg|postgres|postgresql)$ ]]; then dbtype=pg
@@ -195,8 +209,8 @@ set-vars-from-conninfo-uri() {
   else
     die "Unknown database type in URI: '$dbtype'"
   fi
-  printf -v "$to_from" "$dbtype"
-  export "$to_from"
+  printf -v "HITHER_$from_to" "$dbtype"
+  export "HITHER_$from_to"
   set-export TYPE "$dbtype"
   url="${url/${BASH_REMATCH[1]}:/}"
   url="${url#//}"
@@ -278,9 +292,11 @@ assert-command() {
 }
 
 create-action-command() {
-  command="hither-cmd-"
+  command="hither-"
   if [ -n "$HITHER_ACTION" ]; then
     command+="$HITHER_ACTION-"
+  else
+    command+="cmd-"
   fi
   command+="$HITHER_FROM-to-$HITHER_TO"
   if [ -n "$HITHER_WITH" ]; then

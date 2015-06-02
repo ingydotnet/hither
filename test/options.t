@@ -25,7 +25,28 @@ test2() {
 
   OUT=path/to/django/models.py TO=django
 
-  run-test-vars cmd --in="$IN" --out="$OUT" --to=django
+  run-test-vars cmd --in="$IN" --out="$OUT" --to="$TO"
+}
+
+test3() {
+  reset-test-vars
+
+  IN=http://www.commandprompt.com/ppbook/booktown.sql
+  IN_URL="$IN"
+  FROM=sql
+
+  run-test-vars cmd --in="$IN"
+}
+
+test4() {
+  reset-test-vars
+
+  IN=file1.hsd FROM=hsd
+  IN2=file2.hsd FROM2=hsd
+
+  OUT=migrate-1-2.sql TO=sql WITH=django
+
+  run-test-vars cmd --in="$IN" --in="$IN2" --out="$OUT" --with="$WITH"
 }
 
 test_vars=(
@@ -33,6 +54,11 @@ test_vars=(
   IN_USER IN_PASSWORD
   IN_HOST IN_PORT
   IN_DBNAME IN_TABLE
+
+  IN2 FROM2 IN2_URL IN2_TYPE
+  IN2_USER IN2_PASSWORD
+  IN2_HOST IN2_PORT
+  IN2_DBNAME IN2_TABLE
 
   OUT TO OUT_URL OUT_TYPE
   OUT_USER OUT_PASSWORD
