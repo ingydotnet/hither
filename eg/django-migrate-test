@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+
+set -e
+
+die() { echo "$@"; exit 1; }
+
+django_project=django_project
+django_app=booktown_app
+
+REDIRECT='&>/dev/null'
+
+main() {
+  [ $# -eq 1 ] || die "usage: $0 <virtualenv-path>"
+  setup-virtualenv $1
+  setup-booktown-db
+  setup-django-app
+  setup-model-classes
+  make-initial-migration
+
+  # Change column name
+  perl -pi -e 's/ship_date/ship_timestamp/' $django_project/$django_app/models.py
+
+  # Drop column
+  # perl -pi -e 's/.*ship_date.*//' $django_project/$django_app/models.py
+
+  make-migration-sql
+}
+
+setup-virtualenv() {
+  local venv=$1
+  if [ ! -e $venv ]; then
+    (
+      (
+        set -x
+        virtualenv $venv
+      )
+      source $venv/bin/activate
+      set -x
+      pip install --upgrade pip
+      pip install django
+      pip install psycopg2
+    )
+  fi
+  source $venv/bin/activate
+}
+
+setup-booktown-db() {
+  psql -c 'drop database booktown' &>/dev/null || true
+  (
+    set -o pipefail
+    cat test/dataset/pg/booktown.sql |
+      perl -pe 's/(booktown )postgres/$1/' |
+      psql |& dev-null
+  )
+}
+
+setup-django-app() {
+  rm -fr $django_project
+  django-admin startproject $django_project
+  (
+    cd $django_project
+    django-admin startapp $django_app
+  )
+  local settings=$django_project/$django_project/settings.py
+  perl -pi \
+    -e 's/^(\s+).NAME.:.*//' \
+    $settings
+  perl -pi \
+    -e 's/^(\s+)(.django\.contrib\.staticfiles.,)$/$1$2\n$1'"'$django_app',/" \
+    $settings
+  database_conf="
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'booktown',
+        'USER': 'ingy',
+        'PASSWORD': 'h1th3r',
+        'HOST': 'localhost',
+        'PORT': '5432',"
+  perl -pi \
+    -e "s/^(\\s+).ENGINE.:.*/$database_conf/" \
+    $settings
+}
+
+setup-model-classes() {
+  python $django_project/manage.py inspectdb --database default \
+    > $django_project/$django_app/models.py
+  perl -pi \
+    -e 's/(^\s+)id =.*/${1}id = models.IntegerField(primary_key=True)/' \
+    $django_project/$django_app/models.py
+}
+
+make-initial-migration() {
+  python $django_project/manage.py makemigrations $django_app |& dev-null
+  python $django_project/manage.py migrate auth |& dev-null
+  python $django_project/manage.py migrate $django_app |& dev-null
+  perl -pi -e 's/^\s+managed = False\n//' \
+    $django_project/$django_app/models.py
+  python $django_project/manage.py makemigrations $django_app |& dev-null
+  python $django_project/manage.py migrate $django_app |& dev-null
+}
+
+make-migration-sql() {
+  yes | python $django_project/manage.py makemigrations $django_app |& dev-null
+  migration="$(
+    set -o pipefail
+    ls -1t $django_project/$django_app/migrations/ | head -1
+  )"
+  python $django_project/manage.py sqlmigrate $django_app ${migration%.py} \
+    2>/dev/null
+}
+
+dev-null() {
+  cat > /dev/null
+}
+
+[ $0 != $BASH_SOURCE ] || main "$@"
