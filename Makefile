@@ -8,7 +8,7 @@ help:
 	@echo '  doc    - Build docs'
 
 test:
-	prove -vr test/
+	prove -lvr test/
 
 doc: ReadMe.pod
 	make -C doc/
