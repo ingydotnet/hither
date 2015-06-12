@@ -6,6 +6,7 @@ export PATH="\
 $PWD/bin:\
 $PWD/ext/bashplus/bin:\
 $PWD/ext/test-more-bash/lib:\
+$PWD/ext/test-more-bash/ext/test-tap-bash/lib:\
 $PATH
 "
 
