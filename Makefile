@@ -7,8 +7,11 @@ help:
 	@echo '  test	- Run tests'
 	@echo '  doc    - Build docs'
 
-test:
+test: deps
 	prove -lvr test/
+
+deps:
+	./test/check-system-deps.bash
 
 doc: ReadMe.pod
 	make -C doc/
