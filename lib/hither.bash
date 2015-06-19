@@ -86,14 +86,14 @@ django-env-setup() {
       pip install django
       pip install pyyaml
       pip install psycopg2
-    ) &>/dev/null
+    ) &>/tmp/hither-out || django-setup-fail
   fi
 
   if [ ! -e $django_root ]; then
     (
       cd $virtualenv
       django-admin startproject $django_project
-    ) &>/dev/null
+    ) &>/tmp/hither-out || django-setup-fail
   fi
 
 #   cp $(dirname $0)/../share/django-settings.py $django_root/settings.py
@@ -113,4 +113,9 @@ configured. To reuse this environment, enter this line:
 
 ...
   fi
+}
+
+django-setup-fail() {
+  cat /tmp/hither-out
+  die "Django env setup failed"
 }
