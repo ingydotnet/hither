@@ -12,6 +12,7 @@ OK=true
 coffee_install='npm install -g coffee-script'
 node_install='https://github.com/creationix/nvm#usage'
 nvm_install='https://github.com/creationix/nvm#manual-install'
+pg_buildext_install='sudo apt-get install postgresql-server-dev-all'
 plenv_install='https://github.com/tokuhirom/plenv#installation'
 psql_install='sudo apt-get install postgresql'
 virtualenv_install='sudo apt-get install python-virtualenv'
@@ -29,9 +30,8 @@ missing() {
 }
 
 # XXX nvm not working with type
-for dep in node coffee plenv psql virtualenv; do
+for dep in node coffee plenv psql pg_buildext virtualenv; do
   if ! ( type $dep &>/dev/null ); then
-    die
     missing
   fi
 done
