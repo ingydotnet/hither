@@ -96,9 +96,8 @@ django-env-setup() {
     ) &>/tmp/hither-out || django-setup-fail
   fi
 
-#   cp $(dirname $0)/../share/django-settings.py $django_root/settings.py
-# 
-#   cp $HITHER_LIB/hither*.py $HITHER_DJANGO_ROOT/lib/python2.7/site-packages/django/core/management/commands/
+  cp $(dirname $0)/../share/django-settings.py $django_root/settings.py
+  cp $HITHER_LIB/hither*.py $HITHER_DJANGO_ROOT/lib/python2.7/site-packages/django/core/management/commands/
 
   source $HITHER_DJANGO_ROOT/bin/activate
 }
