@@ -11,7 +11,7 @@ test: deps
 	prove -lvr test/
 
 deps:
-	./test/check-system-deps.bash
+	@./test/check-system-deps.bash
 
 doc: ReadMe.pod
 	make -C doc/
