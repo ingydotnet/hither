@@ -15,13 +15,17 @@ nvm_install='https://github.com/creationix/nvm#manual-install'
 pg_buildext_install='sudo apt-get install postgresql-server-dev-all'
 plenv_install='https://github.com/tokuhirom/plenv#installation'
 psql_install='sudo apt-get install postgresql'
+Python_h_install='sudo apt-get install python2.7-dev'
 virtualenv_install='sudo apt-get install python-virtualenv'
 
 YAML__XS_install='cpanm YAML::XS'
 
 missing() {
   echo "Missing dependency: '$dep'."
-  local var="${dep//:/_}"
+  local var="$dep"
+  local var="${var##*/}"
+  local var="${var//:/_}"
+  local var="${var//./_}"
   install_var="${var}_install"
   if [ -n "${!install_var}" ]; then
     echo "    try: ${!install_var}"
@@ -46,6 +50,12 @@ fi
 
 for dep in YAML::XS; do
   if ! ( perl -M$dep -e1 &>/dev/null ); then
+    missing
+  fi
+done
+
+for dep in /usr/include/python2.7/Python.h; do
+  if [ ! -e "$dep" ]; then
     missing
   fi
 done
