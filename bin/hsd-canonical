@@ -1,0 +1,59 @@
+#!/usr/bin/env coffee
+
+fs = require 'fs'
+yaml = require 'js-yaml'
+crypto = require 'crypto'
+
+# say = console.log
+# xxx = (o)->
+#   say yaml.dump o
+#   process.exit 5
+
+run = (args)->
+  stdin = ''
+  process.stdin.on 'data', (buffer)->
+    stdin += buffer.toString()
+  process.stdin.on 'end', ->
+    hsd_in = yaml.load stdin
+    hsd_out = {}
+
+    hsd_out.info = copy_info hsd_in
+    hsd_out.table = copy_table hsd_in
+
+    shasum = crypto.createHash 'sha1'
+    shasum.update yaml.dump hsd_out
+    hsd_out.info.hsid = shasum.digest 'hex'
+
+    process.stdout.write yaml.dump hsd_out
+
+copy_info = (i)->
+  info = i.info
+  o =
+    name: info.name
+    type: info.type
+  return o
+
+copy_table = (i)->
+  table = i.table
+  o = []
+  for t in table
+    hash =
+      name: t.name
+      cols: []
+    cols = hash.cols
+    for col in t.cols
+      hash.cols.push copy_col col
+    o.push hash
+  return o
+
+copy_col = (i)->
+  o =
+    name: i.name
+    type: i.type
+  if i.need?
+    o.need = i.need
+  return o
+
+run process.argv[2..]
+
+# vim: set sw=2:
