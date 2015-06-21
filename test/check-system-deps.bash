@@ -10,11 +10,12 @@ $PATH
 OK=true
 
 coffee_install='npm install -g coffee-script'
-node_install='https://github.com/creationix/nvm#usage'
+node_install='https://github.com/creationix/nvm#manual-install'
 nvm_install='https://github.com/creationix/nvm#manual-install'
 pg_buildext_install='sudo apt-get install postgresql-server-dev-all'
 plenv_install='https://github.com/tokuhirom/plenv#installation'
 psql_install='sudo apt-get install postgresql'
+psql_user_install='./eg/create-test-user-pg'
 Python_h_install='sudo apt-get install python2.7-dev'
 virtualenv_install='sudo apt-get install python-virtualenv'
 
@@ -26,6 +27,7 @@ missing() {
   local var="${var##*/}"
   local var="${var//:/_}"
   local var="${var//./_}"
+  local var="${var// /_}"
   install_var="${var}_install"
   if [ -n "${!install_var}" ]; then
     echo "    try: ${!install_var}"
@@ -39,6 +41,13 @@ for dep in node coffee plenv psql pg_buildext virtualenv; do
     missing
   fi
 done
+
+if ( type psql &>/dev/null ); then
+  if ! (psql -c '\l' &>/dev/null ); then
+    dep='psql user'
+    missing
+  fi
+fi
 
 if ( type node &>/dev/null ); then
   for dep in js-yaml pg-json-schema-export; do
