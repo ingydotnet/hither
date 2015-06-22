@@ -305,6 +305,14 @@ export HITHER_BIN="$(cd -P `dirname $BASH_SOURCE` && pwd -P)"
 export HITHER_LIB="$(cd -P `dirname $BASH_SOURCE`/../lib && pwd -P)"
 export PATH="$HITHER_LIB:$PATH"
 
+osx() {
+  if [ "$(uname)" == Darwin ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 [ "${BASH_SOURCE[0]}" != "$0" ] || main "$@"
 
 # vim: set lisp:
