@@ -3,6 +3,7 @@
 set -e
 
 TMP="$(mktemp -t hither-XXXXXXXX)"
+user=${1:-$USER}
 
 error() {
   cat $TMP | grep -v 'could not change'
@@ -12,12 +13,12 @@ error() {
 
 (
   set -x
-  sudo -u postgres createuser -s -d -r $USER 2>$TMP
+  sudo -u postgres createuser -s -d -r $user 2>$TMP
 ) || error $?
 
 (
   set -x
-  sudo -u postgres createdb $USER 2>$TMP
+  sudo -u postgres createdb $user 2>$TMP
 ) || error $?
 
 echo
@@ -26,7 +27,7 @@ echo
 
 (
   set -x
-  sudo -u postgres psql -c "\\password $USER" 2>/dev/null
+  sudo -u postgres psql -c "\\password $user" 2>/dev/null
 ) || error
 
 rm -f "$TMP"
