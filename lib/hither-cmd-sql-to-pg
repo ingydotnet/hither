@@ -11,8 +11,8 @@ if `pg-db-exists "$HITHER_OUT_DBNAME"`; then
   psql -c "drop database $HITHER_OUT_DBNAME" &>/dev/null || true
 fi
 
-read-input |
-  perl -pe 's/(booktown )postgres/$1/' |
-  psql
+psql -c "create database $HITHER_OUT_DBNAME"
+
+read-input | psql $HITHER_OUT_DBNAME
 
 # vim: set lisp ft=sh:

@@ -10,9 +10,7 @@ export HITHER_DJANGO_ROOT="$(
 )"
 
 output="$(
-  hither \
-    --in=pg://$USER:h1th3r@localhost:5432/booktown \
-    --to=django 2>/dev/null
+  hither --in=pg://$USER:h1th3r@localhost:5432/booktown --to=django 2>/dev/null
 )"
 
 like "$output" 'class AlternateStock' \

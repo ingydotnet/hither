@@ -23,9 +23,9 @@ reset-env() {
 
 assert-booktown-db() {
   if `! pg-db-exists booktown`; then
-    RUN hither \
-      --in=test/dataset/pg/booktown.sql \
-      --out=pg://hither:h1th3r@localhost:5432/booktown
+    psql -c "create database booktown" &>/dev/null
+    cat test/dataset/pg/booktown-{schema,data}-dump.sql |
+      psql booktown &>/dev/null
   fi
   if `! pg-db-exists booktown`; then
     die "Can't create booktown db"

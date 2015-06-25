@@ -10,10 +10,15 @@ fi
 ok "`! pg-db-exists booktown`" "booktown db doesn't exist"
 
 RUN hither \
-  --in=test/dataset/pg/booktown.sql \
+  --in=test/dataset/pg/booktown-schema-dump.sql \
   --out=pg://$USER:h1th3r@localhost:5432/booktown
 
 ok "$retval" "'hither' return code is 0"
+
+{
+  cat test/dataset/pg/booktown-data-dump.sql |
+    psql booktown &>/dev/null
+}
 
 ok "`pg-db-exists booktown`" "booktown db exists"
 
