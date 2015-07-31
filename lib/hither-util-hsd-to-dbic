@@ -1,12 +1,91 @@
 #!/usr/bin/env perl
 use strict; use warnings;
 use File::Basename;
+use Scalar::Util;
+
 use lib dirname($0);
 use Hither;
 
+my $config;
+sub indent;
+sub attr;
+
+my %attribute = (
+  type => qq|data_type => "%s",|,
+  need => "is_nullable => 0,",
+  size => "size => %d",
+  default => "default_value => %s,",
+);
+
 # Move logic common to hither-util-hsd-to-django into a Hither.pm
 sub main {
-  print uc read_input();
+  my $hsd = Load read_input();
+  $config = LoadFile 'dbic.yaml';
+  for my $table (@{$hsd->{table}}) {
+    my $name = "$ENV{HITHER_OUT}/$table->{name}.pm";
+    open OUT, '>', $name or die;
+
+    print OUT make_dbic_class($table);
+
+    close OUT;
+  }
+}
+
+sub make_dbic_class {
+  my ($table) = @_;
+  my $name = $table->{name};
+  my $prefix = $config->{class_prefix};
+
+  my $out = <<"...";
+package ${prefix}::$name;
+use base 'DBIx::Class';
+use strict;
+use warnings;
+
+__PACKAGE__->load_components(qw/Core/);
+__PACKAGE__->table('$name');
+
+__PACKAGE__->add_columns(
+...
+
+  for my $col (@{$table->{cols}}) {
+    my $default = $col->{default};
+    #my ($name, );
+    $out .= <<"...";
+  "$col->{name}",
+...
+
+    $col->{default} = qq|"$default"|
+      unless Scalar::Util::looks_like_number($default) ||
+      $default eq 'undef';
+
+    $out .= join "\n",
+      indent('{'),
+      (
+        map { attr $_, $col->{$_} }
+        grep { defined $col->{$_} }
+        qw/type default need size/
+      ),
+      indent('},'),
+      '';
+  }
+
+  $out .= <<"...";
+);
+
+1;
+...
+
+  return $out;
+}
+
+sub indent {
+  "  $_[0]";
+}
+
+sub attr {
+  my $key = shift;
+  indent indent sprintf $attribute{$key}, @_;
 }
 
 main();
