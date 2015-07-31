@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+source "$(cd -P `dirname $BASH_SOURCE` && pwd -P)/../lib/hither.bash"
+
+(
+  set -o pipefail
+  read-input | "$HITHER_LIB"/hither-util-hsd-to-dbic | write-output
+)
+
+# vim: set ft=sh:
